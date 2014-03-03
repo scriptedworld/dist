@@ -1,0 +1,9 @@
+---
+name: Runner
+redis_host: localhost
+redis_port: 6379
+redis_pass: slenderman
+log_dir: ./
+debug: true # Must be true or false
+report_interval_seconds: 5
+

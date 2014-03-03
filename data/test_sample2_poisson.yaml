@@ -1,0 +1,22 @@
+---
+name: Runner
+redis_host: localhost
+redis_port: 6379
+redis_pass: slenderman
+base_attributes_file_path: data/tests/base_attributes.yaml
+report_interval_seconds: 5
+log_dir: ./
+use_poisson: 1 # Remove this line completely to disable poisson timing distribution
+debug: false   # Must be true or false
+phases:
+  - 
+    name: Phase 1
+    description: Run!
+    jobs:
+      -
+        job_class: EmptyJob
+        per_unit: 200
+        unit: SECOND
+    phase_duration: 600
+    phase_duration_units: SECOND
+

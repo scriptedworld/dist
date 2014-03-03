@@ -1,0 +1,24 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    awesome_print (1.1.0)
+    coderay (1.0.9)
+    hiredis (0.4.5)
+    json (1.8.0)
+    method_source (0.8.2)
+    pry (0.9.12.2)
+      coderay (~> 1.0.5)
+      method_source (~> 0.8)
+      slop (~> 3.4)
+    redis (3.0.4)
+    slop (3.4.6)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  awesome_print
+  hiredis
+  json
+  pry
+  redis

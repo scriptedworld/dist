@@ -1,0 +1,30 @@
+---
+name: Runner
+redis_host: localhost
+redis_port: 6379
+redis_pass: slenderman
+base_attributes_file_path: ./data/tests/base_attributes.yaml
+report_interval_seconds: 5
+log_dir: ./
+debug: false # Must be true or false
+phases:
+  -
+    name: Phase 1
+    description: "First Phase: Low Load, warming things up."
+    jobs:
+      -
+        job_class: EmptyJob
+        per_unit: 10
+        unit: SECOND
+    total_count: 30
+  -
+    name: Phase 2
+    description: "Second Phase: More Load, a bit of stress."
+    jobs:
+      -
+        job_class: EmptyJob
+        per_unit: 50
+        unit: SECOND
+    phase_duration: 60
+    phase_duration_units: SECOND
+

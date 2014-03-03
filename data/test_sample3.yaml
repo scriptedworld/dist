@@ -1,0 +1,20 @@
+---
+name: Runner
+redis_host: localhost
+redis_port: 6379
+redis_pass: slenderman
+base_attributes_file_path: ./data/tests/base_attributes.yaml
+report_interval_seconds: 5
+log_dir: ./
+debug: false   # Must be true or false
+phases:
+  -
+    name: Phase 1
+    description: "Long slow test for testing the Reporter."
+    jobs:
+      -
+        job_class: EmptyJob
+        per_unit: 1
+        unit: SECOND
+    total_count: 300
+

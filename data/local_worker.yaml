@@ -1,0 +1,12 @@
+---
+name: Runner
+redis_host: localhost
+redis_port: 6379
+redis_pass: slenderman
+log_dir: ./
+debug: false                # Must be true or false
+queue_method: polling       # Allowed values are 'polling' and 'signals' ... Do NOT use 'signals' if you wanting to handle more than about 30 jobs/sec.
+polling_delay_seconds: 1.0
+polling_delay_stdev:   0.25
+polling_timing: randomized  # Allowed values are 'absolute' and 'randomized' This affects sleep timers during job runs. ( For Job sleep timers that haven't been specific about the type of timer they want. )
+
