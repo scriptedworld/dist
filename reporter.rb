@@ -28,20 +28,15 @@ class StatsContainer
   def getSystemwideStats
     raise "Not connected to Redis." if @redis.nil?
 
-    @stats[ 'redis_transaction_count' ]    = @redis.info()['total_commands_processed'].to_i
-    @stats[ 'redis_keyset_count' ]         = @redis.dbsize()
+    @stats[ 'redis_transaction_count' ] = @redis.info()[ 'total_commands_processed' ].to_i
+    @stats[ 'redis_keyset_count'      ] = @redis.dbsize()
 
-    @stats[ 'jobs_ready_count' ]           = @redis.scard( 'jobs.READY' )
-    @stats[ 'jobs_processing_count' ]      = @redis.scard( 'jobs.PROCESSING' )
-    @stats[ 'jobs_complete_count' ]        = @redis.scard( 'jobs.COMPLETE' )
-    @stats[ 'jobs_broken_count' ]          = @redis.scard( 'jobs.BROKEN' )
+    @stats[ 'jobs_ready_count'        ] = @redis.scard( 'jobs.READY'      )
+    @stats[ 'jobs_processing_count'   ] = @redis.scard( 'jobs.PROCESSING' )
+    @stats[ 'jobs_complete_count'     ] = @redis.scard( 'jobs.COMPLETE'   )
+    @stats[ 'jobs_broken_count'       ] = @redis.scard( 'jobs.BROKEN'     )
 
-    @stats[ 'devices_unregistered_count' ] = @redis.scard( 'devices.UNREGISTERED' )
-    @stats[ 'devices_unsubscribed_count' ] = @redis.scard( 'devices.UNSUBSCRIBED' )
-    @stats[ 'devices_freetrial_count' ]    = @redis.scard( 'devices.FREETRIAL' )
-    @stats[ 'devices_subscribed_count' ]   = @redis.scard( 'devices.SUBSCRIBED' )
-    @stats[ 'devices_locked_count' ]       = @redis.scard( 'devices.LOCKED' )
-    @stats[ 'devices_broken_count' ]       = @redis.scard( 'devices.BROKEN' )
+    # TODO: Add more stats here.
 
     # TODO: Add code here to track the number of idle workers 
     #       ( through the count of subscribers for the job ready channel )
