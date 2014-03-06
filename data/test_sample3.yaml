@@ -6,7 +6,9 @@ redis_pass: slenderman
 base_attributes_file_path: ./data/tests/base_attributes.yaml
 report_interval_seconds: 5
 log_dir: ./
-debug: false   # Must be true or false
+use_poisson: false # Must be true or false
+continuous: false  # Must be true or false
+debug: false       # Must be true or false
 phases:
   -
     name: Phase 1

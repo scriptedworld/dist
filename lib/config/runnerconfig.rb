@@ -66,8 +66,10 @@ class RunnerConfig < BaseConfig
     raise "Phases array incorrectly defined." unless @attributes[ 'phases' ].is_a?( Array )
     @attributes[ 'phases' ].each { |p| RunnerPhaseConfig.new( p ).validate() }
 
-    # Any provided value for use_poisson means use it, it's absence means don't
-    @attributes[ 'use_poisson' ] = @attributes.key?( 'use_poisson' )
+    # NOTE: use_poisson & continuous both rely on the falseness of non-existent values.
+    #       but, ensure they are boolean values for later retrieval/comparison.
+    @attributes[ 'use_poisson' ] = ( @attributes[ 'use_poisson' ] == true )
+    @attributes[ 'continuous'  ] = ( @attributes[ 'continuous'  ] == true )
 
   end
 
