@@ -1,4 +1,5 @@
 
+require 'logger'
 require 'net/http'
 
 require 'awesome_print'
@@ -22,12 +23,12 @@ require './lib/job/exceptionjob.rb'
 require './lib/job/jobexceptionjob.rb'
 
 # This stores the number of milliseconds in 1 interval of the given length
-TIME_UNITS = { 'MILLIS' => 1,
-               'SECOND' => 1000,
-               'MINUTE' => 60000,
-               'HOUR'   => 3600000,
-               'DAY'    => 86400000,
-               'WEEK'   => 604800000 }
+TIME_UNITS = { 'MILLIS' => 1,              # 1 ms is 1 ms
+               'SECOND' => 1000,           # 1000 ms in 1 sec
+               'MINUTE' => 60000,          # 60 sec in 1 min
+               'HOUR'   => 3600000,        # 60 min in 1 hr
+               'DAY'    => 86400000,       # 24 hr in 1 day
+               'WEEK'   => 604800000 }     # 7 days in 1 wk
 
 # Predefined sets of chars for the random-char and random-string functions.
 ALPHA_CHARS        = %w( A B C D E F G H I J K L M N O P Q R S T U V W X Y Z )
@@ -44,14 +45,6 @@ def handleRedisConfig( redis_host, redis_port, redis_pass )
   $host = redis_host
   $port = redis_port
   $pass = redis_pass
-end
-
-def displayDebugMessage( message )
-  $stdout.puts message.ai if $DEBUG
-end
-
-def displayErrorMessage( message )
-  $stderr.puts message.ai
 end
 
 def loadFile( file_path )

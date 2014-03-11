@@ -11,6 +11,10 @@ class BaseConfig
     @attributes[ key ] = value
   end
 
+  def include?( key )
+    @attributes.include?( key )
+  end
+
   def initialize( file_path )
     @attributes = loadYAMLFile( file_path )
     validate()

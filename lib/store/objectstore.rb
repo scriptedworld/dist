@@ -5,7 +5,11 @@ require 'hiredis'
 require 'json'
 require 'yaml'
 
+require './lib/logged.rb'
+
 class ObjectStore
+
+  include Logged
 
   def initialize
     @item_ready_signal = 'signal.object.ready'

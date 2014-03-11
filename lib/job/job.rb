@@ -1,7 +1,10 @@
 
 require './lib/helpers.rb'
+require './lib/logged.rb'
 
 class Job
+
+  include Logged
 
   def initialize( id = nil )
     @job_store                 = JobStore.new

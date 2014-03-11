@@ -10,9 +10,11 @@ class RunnerPhaseJobConfig
   def validate
     validateKeysExist( @attributes, *( %w( job_class per_unit unit ) ) )
 
-    raise "provided job_class #{ @attributes[ 'job_class' ] } is not an existant class." unless class_exists?( @attributes[ 'job_class' ] )
+    raise "provided job_class #{ @attributes[ 'job_class' ] } is not an existent class." unless class_exists?( @attributes[ 'job_class' ] )
     @attributes[ 'per_unit' ] = Float( @attributes[ 'per_unit' ] )
     validateTimeIntervalName( @attributes[ 'unit' ] )
+
+    # TODO: Add validation if instance specific job attributes exist.
   end
 end
 
