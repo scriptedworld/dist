@@ -8,9 +8,12 @@ require 'gruff'
 require 'facets'
 require 'json'
 
+require './lib/logged.rb'
 require './lib/helpers.rb'
 
 class Graph
+
+  include Logged
 
   def initialize( new_options = {} )
 
@@ -26,7 +29,8 @@ class Graph
 
   def run( data )
 
-    puts data.ai if $DEBUG
+    displayDebugMessage( "Data:" )
+    displayDebugMessage( data )
 
     # Input includes a timestamps collection
     # + Arrays for each stat requested.
@@ -54,8 +58,10 @@ class Graph
 
     end
 
-    puts stats.ai if $DEBUG
-    puts indexes.ai if $DEBUG
+    displayDebugMessage( "Stats:" )
+    displayDebugMessage( stats )
+    displayDebugMessage( "Indexes:" )
+    displayDebugMessage( indexes )
 
     # Lets make a graph!
 

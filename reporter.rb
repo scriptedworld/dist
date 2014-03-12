@@ -1,9 +1,11 @@
 #!/usr/bin/env ruby
 
-require './lib/helpers.rb'
+require './lib/BaseApp.rb'
 require './lib/config/reporterconfig.rb'
 
 class StatsContainer
+
+  include Logged
 
   def initialize
     @host  = nil
@@ -192,41 +194,52 @@ class StatsContainer
 
 end
 
-config = ReporterConfig.new( ARGV.pop )
+class ReporterApp < BaseApp
 
-# Set up a flag so that our first iteration cleans out stagnant data.
-firstRun = true
-
-while( true ) do
-
-  start_time = Time.now.to_f
-
-  displayDebugMessage( "Processing ... #{ start_time }" )
-
-  s = StatsContainer.new
-  s.configureRedis( config[ 'redis_host' ], config[ 'redis_port' ], config[ 'redis_pass' ] )
-
-  # Clean up an stale metrics data in REDIS.
-  if( firstRun )
-    s.cleanOldStats
-    firstRun = false
+  def getConfigClass
+    ReporterConfig
   end
 
-  s.setTimestamp( start_time )
+  def instance_run
 
-  s.getSystemwideStats()
+    # Set up a flag so that our first iteration cleans out stagnant data.
+    firstRun = true
 
-  %w( COMPLETE BROKEN ).each do |curr_state|
-    s.calcStatsForJobState( curr_state )
+    while( true ) do
+
+      start_time = Time.now.to_f
+
+      displayDebugMessage( "Processing ... #{ start_time }" )
+
+      s = StatsContainer.new
+      s.configureRedis( $config[ 'redis_host' ], $config[ 'redis_port' ], $config[ 'redis_pass' ] )
+
+      # Clean up an stale metrics data in REDIS.
+      if( firstRun )
+        s.cleanOldStats
+        firstRun = false
+      end
+
+      s.setTimestamp( start_time )
+
+      s.getSystemwideStats()
+
+      %w( COMPLETE BROKEN ).each do |curr_state|
+        s.calcStatsForJobState( curr_state )
+      end
+
+      s.calcDiffs()
+
+      s.save()
+
+      work_completed_time = Time.now.to_f - start_time
+      sleep_time = $config[ 'report_interval_seconds' ] - work_completed_time
+      sleep( sleep_time )
+
+    end
+
   end
-
-  s.calcDiffs()
-
-  s.save()
-
-  work_completed_time = Time.now.to_f - start_time
-  sleep_time = config[ 'report_interval_seconds' ] - work_completed_time
-  sleep( sleep_time )
 
 end
 
+ReporterApp.new().run() if ( __FILE__ == $0 )
