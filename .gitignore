@@ -3,3 +3,7 @@ tags
 *.rdb
 *.log
 
+.rdoc
+coverage/
+vendor/
+

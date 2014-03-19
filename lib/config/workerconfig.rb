@@ -37,6 +37,7 @@ class WorkerConfig < BaseConfig
       else
          @attributes[ 'polling_delay_stdev' ] = 0.25 # If polling_delay_stdev is not provided, default to a 0.25 value which is based on the above default of 1.0 sec..
       end
+
     end
 
   end
