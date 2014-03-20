@@ -1,7 +1,12 @@
 #!/usr/bin/env ruby
 
-require './lib/baseapp.rb'
-require './lib/config/workerconfig.rb'
+this_dir = File.dirname( __FILE__ )
+$LOAD_PATH << this_dir unless $LOAD_PATH.include? this_dir
+lib_dir = File.join( this_dir, 'lib' )
+$LOAD_PATH << lib_dir unless $LOAD_PATH.include? lib_dir
+
+require 'baseapp'
+require 'config/workerconfig'
 
 class WorkerApp < BaseApp
 

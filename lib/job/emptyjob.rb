@@ -1,5 +1,5 @@
 
-require './lib/job/job.rb'
+require 'job/job'
 
 class EmptyJob < Job
   def run

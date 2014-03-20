@@ -1,5 +1,4 @@
 
-
 require 'rake'
 require 'rake/tasklib'
 
@@ -45,6 +44,7 @@ RDoc::TagsTask.new do |t|
 end
 
 task :quality   => [ :flog, :flay, :reek, :rubocop ]
+# task :quality   => [ :flog, :flay, :reek ]
 # task :quality => [ :flog, :flay                  ]
 # task :test    => [ :spec, :quality               ]
 

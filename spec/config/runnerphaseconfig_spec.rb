@@ -1,5 +1,5 @@
-require './spec/spec_helper.rb'
-require './lib/config/runnerconfig.rb'
+require 'spec_helper'
+require 'config/runnerconfig'
 
 describe "Runner Phase Configuration Objects" do
 
@@ -8,7 +8,13 @@ describe "Runner Phase Configuration Objects" do
     @all_attributes_base = Hash.new
     @all_attributes_base[ 'name'        ] = 'Phase One'
     @all_attributes_base[ 'description' ] = 'Junk Phase for Testing'
-    @all_attributes_base[ 'jobs'        ] = []
+    @all_attributes_base[ 'jobs'        ] = [
+      {
+        'job_class' => 'EmptyJob',
+        'per_unit'  => 1,
+        'unit'      => 'SECOND'
+      }
+    ]
 
     @all_attributes_with_count = @all_attributes_base.dup
     @all_attributes_with_count[ 'total_count' ] = 1
@@ -68,7 +74,22 @@ describe "Runner Phase Configuration Objects" do
         }.to_not raise_error()
       end
 
-      # TODO: Need to add code here to iterate through the keys provided
+      [ @all_attributes_with_duration, @all_attributes_with_count ].each do |curr_attr_coll|
+
+        curr_attr_coll.keys.each do |curr_key|
+          curr_attrs = curr_attr_coll.dup
+          curr_attrs.delete( curr_key )
+
+          expected_message = "Key #{ curr_key } missing."
+          expected_message = "Either total_count or phase_duration must be provided for each phase definition." if ( ( curr_key == 'total_count' ) || ( curr_key == 'phase_duration' ) || ( curr_key == 'phase_duration_units' ) )
+
+          expect {
+            RunnerPhaseConfig.new( curr_attrs ).validate()
+          }.to raise_error( expected_message )
+
+        end
+
+      end
 
       expect {
         RunnerPhaseConfig.new( @empty ).validate()
@@ -82,10 +103,29 @@ describe "Runner Phase Configuration Objects" do
         RunnerPhaseConfig.new( @all_attributes_with_both ).validate()
       }.to_not raise_error()
 
-      expect {
-        RunnerPhaseConfig.new( @all_attributes_base ).validate()
-      }.to raise_error( 'Either total_count or phase_duration must be provided for each phase definition.' )
+    end
 
+    it "should ignore the phase_duration & phase_duration_units if either are missing" do
+
+      attrs_without_phase_duration = @all_attributes_with_both.dup
+      attrs_without_phase_duration.delete( 'phase_duration' )
+
+      cfg = RunnerPhaseConfig.new( attrs_without_phase_duration )
+      cfg.validate()
+      expect( cfg.attributes.keys ).to_not include( 'phase_duration', 'phase_duration_units' )
+
+      attrs_without_phase_duration_units = @all_attributes_with_both.dup
+      attrs_without_phase_duration_units.delete( 'phase_duration_units' )
+
+      cfg = RunnerPhaseConfig.new( attrs_without_phase_duration_units )
+      cfg.validate()
+      expect( cfg.attributes.keys ).to_not include( 'phase_duration', 'phase_duration_units' )
+
+    end
+
+    it "should create and validate a RunnerPhaseJobConfig object for each member of the jobs array." do
+      RunnerPhaseJobConfig.any_instance.should_receive( :validate ).once
+      RunnerPhaseConfig.new( @all_attributes_with_count ).validate()
     end
 
   end

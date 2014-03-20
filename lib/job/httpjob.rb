@@ -1,7 +1,7 @@
 
 require 'uri'
 
-require './lib/job/job.rb'
+require 'job/job'
 
 class HttpJob < Job
 

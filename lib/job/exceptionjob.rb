@@ -1,5 +1,5 @@
 
-require './lib/job/job.rb'
+require 'job/job'
 
 class ExceptionJob < Job
   def setup

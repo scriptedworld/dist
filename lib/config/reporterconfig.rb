@@ -1,6 +1,5 @@
 
-require './lib/helpers.rb'
-require './lib/config/baseconfig.rb'
+require 'config/baseconfig'
 
 class ReporterConfig < BaseConfig
 

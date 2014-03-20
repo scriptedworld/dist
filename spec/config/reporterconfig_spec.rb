@@ -1,5 +1,5 @@
-require './spec/spec_helper.rb'
-require './lib/config/reporterconfig.rb'
+require 'spec_helper'
+require 'config/reporterconfig'
 
 require 'Tempfile'
 

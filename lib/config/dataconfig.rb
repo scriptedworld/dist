@@ -1,5 +1,5 @@
 
-require './lib/config/baseconfig.rb'
+require 'config/baseconfig'
 
 class DataConfig < BaseConfig
 

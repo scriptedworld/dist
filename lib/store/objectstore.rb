@@ -5,7 +5,7 @@ require 'hiredis'
 require 'json'
 require 'yaml'
 
-require './lib/logged.rb'
+require 'logged'
 
 class ObjectStore
 

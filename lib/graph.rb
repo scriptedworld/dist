@@ -8,8 +8,8 @@ require 'gruff'
 require 'facets'
 require 'json'
 
-require './lib/logged.rb'
-require './lib/helpers.rb'
+require 'logged'
+require 'helpers'
 
 class Graph
 

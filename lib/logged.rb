@@ -1,5 +1,5 @@
 
-require './lib/helpers.rb'
+require 'helpers'
 
 module Logged
 

@@ -1,5 +1,5 @@
 
-require './lib/store/objectstore.rb'
+require 'store/objectstore'
 
 class EventStore < ObjectStore
 

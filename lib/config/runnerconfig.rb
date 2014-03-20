@@ -1,8 +1,10 @@
 
-require './lib/helpers.rb'
-require './lib/config/baseconfig.rb'
+require 'config/baseconfig'
 
 class RunnerPhaseJobConfig
+
+  attr_reader :attributes
+
   def initialize( attributes )
     @attributes = attributes
   end
@@ -19,6 +21,9 @@ class RunnerPhaseJobConfig
 end
 
 class RunnerPhaseConfig
+
+  attr_reader :attributes
+
   def initialize( attributes )
     @attributes = attributes
   end

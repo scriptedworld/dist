@@ -1,5 +1,5 @@
-require './spec/spec_helper.rb'
-require './lib/config/runnerconfig.rb'
+require 'spec_helper'
+require 'config/runnerconfig'
 
 require 'Tempfile'
 
@@ -122,7 +122,7 @@ describe "Runner Configuration Files" do
   end
 
   it "creates & validates RunnerPhaseConfig objects for each hash in the phases array." do
-    RunnerPhaseConfig.any_instance.should_receive( :validate )
+    RunnerPhaseConfig.any_instance.should_receive( :validate ).once
     RunnerConfig.new( @temp_files[ 'all' ].path )
   end
 

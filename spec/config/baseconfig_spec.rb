@@ -1,5 +1,6 @@
-require './spec/spec_helper.rb'
-require './lib/config/baseconfig.rb'
+
+require 'spec_helper'
+require 'config/baseconfig'
 
 require 'Tempfile'
 

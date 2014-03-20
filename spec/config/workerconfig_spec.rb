@@ -1,5 +1,5 @@
-require './spec/spec_helper.rb'
-require './lib/config/workerconfig.rb'
+require 'spec_helper'
+require 'config/workerconfig'
 
 require 'Tempfile'
 

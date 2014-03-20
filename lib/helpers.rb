@@ -6,21 +6,21 @@ require 'awesome_print'
 require 'json'
 require 'yaml'
 
-require './lib/assert.rb'
+require 'assert'
 
-require './lib/store/jobstore.rb'
-require './lib/store/eventstore.rb'
+require 'store/jobstore'
+require 'store/eventstore'
 
-require './lib/job/job.rb'
-require './lib/job/jobexception.rb'
+require 'job/job'
+require 'job/jobexception'
 
 # NOTE: Events do not require classes, 
 #       they are simply freeform data. Jobs have extended functionality.
 
 # The following Job subtypes are testing specific, and have no other purpose.
-require './lib/job/emptyjob.rb'
-require './lib/job/exceptionjob.rb'
-require './lib/job/jobexceptionjob.rb'
+require 'job/emptyjob'
+require 'job/exceptionjob'
+require 'job/jobexceptionjob'
 
 # This stores the number of milliseconds in 1 interval of the given length
 TIME_UNITS = { 'MILLIS' => 1,              # 1 ms is 1 ms

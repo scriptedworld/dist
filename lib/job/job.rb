@@ -1,6 +1,6 @@
 
-require './lib/helpers.rb'
-require './lib/logged.rb'
+require 'helpers'
+require 'logged'
 
 class Job
 
