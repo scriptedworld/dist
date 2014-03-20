@@ -46,4 +46,9 @@ def assert_responds_to( obj, method_name, message = nil )
   assert( obj.respond_t?( method_name.to_sym ), usable_message )
 end
 
+def assert_includes( collection, value, message = nil )
+  usable_message = message || "Provided collection does not include #{ value }."
+  assert( collection.include?( value ), usable_message )
+end
+
 
