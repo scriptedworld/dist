@@ -2,11 +2,12 @@
 require 'spec_helper'
 require 'config/baseconfig'
 
-require 'Tempfile'
-
 module Dist
 
   describe "Base Configuration" do
+
+    include ConfigHelpers
+    include DebugHelpers
 
     before( :all ) do
 
@@ -25,27 +26,32 @@ module Dist
 
       @all_attributes.merge! junk_attributes
 
-      @temp_files[ 'all' ] = ConfigHelpers.createTempConfig( 'all', @all_attributes )
+      @temp_files[ 'all' ] = createTempConfig( 'all', @all_attributes )
 
       @all_attributes.each_key do |curr_key|
 
         curr_partial_attributes = @all_attributes.dup
         curr_partial_attributes.delete( curr_key )
 
-        @temp_files[ curr_key ] = ConfigHelpers.createTempConfig( curr_key, curr_partial_attributes )
+        @temp_files[ curr_key ] = createTempConfig( curr_key, curr_partial_attributes )
 
       end
 
-      @temp_files[ 'empty' ] = ConfigHelpers.createTempConfig( 'empty', junk_attributes )
+      @temp_files[ 'empty' ] = createTempConfig( 'empty', junk_attributes )
 
       debug_true = @all_attributes.dup
       debug_true[ 'debug' ] = true
 
-      @temp_files[ 'debug_true' ] = ConfigHelpers.createTempConfig( 'debug_true', debug_true )
+      @temp_files[ 'debug_true' ] = createTempConfig( 'debug_true', debug_true )
+
+      debug_false = @all_attributes.dup
+      debug_false[ 'debug' ] = true
+
+      @temp_files[ 'debug_false' ] = createTempConfig( 'debug_false', debug_false )
     end
 
     after( :all ) do
-      ConfigHelpers.cleanupTempConfigList( @temp_files.values )
+      cleanupTempConfigList( @temp_files.values )
     end
 
     it "should instaniate without error when all required attributes are provided." do
@@ -66,7 +72,7 @@ module Dist
 
     it "should raise an exception when any of the required attributes are missing." do
 
-      required_attributes = @temp_files.keys - [ 'all', 'empty', 'non_required_key', 'debug_true' ]
+      required_attributes = @temp_files.keys - [ 'all', 'empty', 'non_required_key', 'debug_true', 'debug_false' ]
 
       required_attributes.each do |curr_attribute|
         expect { BaseConfig.new( @temp_files[ curr_attribute ].path ) }.to raise_error( /Key #{ curr_attribute } missing./ )
@@ -76,25 +82,26 @@ module Dist
 
     describe "affects $DEBUG" do
 
-      describe "should not affect the value of $DEBUG when 'debug' attribute is false" do
+      describe "should NOT affect the value of $DEBUG when 'debug' attribute doesn't exist" do
 
         it "should leave $DEBUG=true alone." do
-
-          expect {
-            DebugHelpers.presetDebugStateAndValidateResult( true, true ) do
-              BaseConfig.new( @temp_files[ 'all' ].path )
-            end
-          }.to be_true
-
+          testDebugState( true, true, @temp_files[ 'all' ].path )
         end
 
         it "should leave $DEBUG=false alone." do
-          expect {
-            DebugHelpers.presetDebugStateAndValidateResult( false, false ) do
-              BaseConfig.new( @temp_files[ 'all' ].path )
-            end
-          }.to be_true
+          testDebugState( false, false, @temp_files[ 'all' ].path )
+        end
 
+      end
+
+      describe "should NOT affect the value of $DEBUG when 'debug' attribute is false" do
+
+        it "should leave $DEBUG=true alone." do
+          testDebugState( true, true, @temp_files[ 'debug_false' ].path )
+        end
+
+        it "should leave $DEBUG=false alone." do
+          testDebugState( false, false, @temp_files[ 'debug_false' ].path )
         end
 
       end
@@ -102,23 +109,11 @@ module Dist
       describe "should affect the value of $DEBUG when 'debug' attribute is true" do
 
         it "should ensure that $DEBUG stays set when previously true." do
-
-          expect {
-            DebugHelpers.presetDebugStateAndValidateResult( true, true ) do
-              BaseConfig.new( @temp_files[ 'debug_true' ].path )
-            end
-          }.to be_true
-
+          testDebugState( true, true, @temp_files[ 'debug_true' ].path )
         end
 
         it "should ensure that $DEBUG gets set when previously false." do
-
-          expect {
-            DebugHelpers.presetDebugStateAndValidateResult( false, true ) do
-              BaseConfig.new( @temp_files[ 'debug_true' ].path )
-            end
-          }.to be_true
-
+          testDebugState( false, true, @temp_files[ 'debug_true' ].path )
         end
 
       end

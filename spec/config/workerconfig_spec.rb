@@ -1,9 +1,9 @@
 require 'spec_helper'
 require 'config/workerconfig'
 
-require 'Tempfile'
-
 describe "Worker Configuration Files" do
+
+  include ConfigHelpers
 
   before( :all ) do
 
@@ -17,14 +17,14 @@ describe "Worker Configuration Files" do
     @all_attributes_signals[ 'queue_method'          ] = 'signals'
 
     @temp_files = Hash.new
-    @temp_files[ 'all_polling' ] = ConfigHelpers.createAdvancedTempConfig( 'all_polling', @all_attributes_polling )
-    @temp_files[ 'all_signals' ] = ConfigHelpers.createAdvancedTempConfig( 'all_signals', @all_attributes_signals )
-    @temp_files[ 'empty'       ] = ConfigHelpers.createAdvancedTempConfig( 'empty' )
+    @temp_files[ 'all_polling' ] = createAdvancedTempConfig( 'all_polling', @all_attributes_polling )
+    @temp_files[ 'all_signals' ] = createAdvancedTempConfig( 'all_signals', @all_attributes_signals )
+    @temp_files[ 'empty'       ] = createAdvancedTempConfig( 'empty' )
 
   end
 
   after( :all ) do
-    ConfigHelpers.cleanupTempConfigList( @temp_files.values )
+    cleanupTempConfigList( @temp_files.values )
   end
 
   it "should be derived from BaseConfig" do
@@ -40,9 +40,9 @@ describe "Worker Configuration Files" do
 
   it "should raise an exception if any value other than 'polling' or 'signals' is provided for queue_method" do
 
-    ConfigHelpers.withAdvancedTempConfigBasedOnAttributes( { 'queue_method' => 'blah' } ) do |temp_file|
+    withAdvancedTempConfigBasedOnAttributes( { 'queue_method' => 'blah' } ) do |temp_file|
 
-      expect { WorkerConfig.new( temp_file.path ) }.to raise_error( "Invalid queue method given ('blah'). Must be one of [\"polling\", \"signals\"]." )
+      expect { WorkerConfig.new( temp_file.path ) }.to raise_error( "Invalid queue_method given ('blah'). Must be one of [\"polling\", \"signals\"]." )
 
     end
 
@@ -53,12 +53,12 @@ describe "Worker Configuration Files" do
     describe "polling specific attributes should default when not provided" do
 
       before( :all ) do
-        @temp_file = ConfigHelpers.createAdvancedTempConfig( 'temp', { 'queue_method' => 'polling' } )
+        @temp_file = createAdvancedTempConfig( 'temp', { 'queue_method' => 'polling' } )
         @conf = WorkerConfig.new( @temp_file.path )
       end
 
       after( :all ) do
-        ConfigHelpers.cleanupTempConfig( @temp_file )
+        cleanupTempConfig( @temp_file )
       end
 
       it "should default polling_timing to 'randomized'" do
@@ -87,7 +87,7 @@ describe "Worker Configuration Files" do
 
       it "should honor polling_timing == 'randomized'" do
 
-        ConfigHelpers.withAdvancedTempConfigBasedOnAttributes( @specific_attributes ) do |temp_file|
+        withAdvancedTempConfigBasedOnAttributes( @specific_attributes ) do |temp_file|
 
           conf = WorkerConfig.new( temp_file.path )
           conf[ 'polling_timing' ].should == 'randomized'
@@ -100,7 +100,7 @@ describe "Worker Configuration Files" do
 
         @specific_attributes[ 'polling_timing' ] = 'absolute'
 
-        ConfigHelpers.withAdvancedTempConfigBasedOnAttributes( @specific_attributes ) do |temp_file|
+        withAdvancedTempConfigBasedOnAttributes( @specific_attributes ) do |temp_file|
           conf = WorkerConfig.new( temp_file.path )
           conf[ 'polling_timing' ].should == 'absolute'
         end
@@ -111,15 +111,15 @@ describe "Worker Configuration Files" do
 
         @specific_attributes[ 'polling_timing' ] = 'fubar'
 
-        ConfigHelpers.withAdvancedTempConfigBasedOnAttributes( @specific_attributes ) do |temp_file|
-          expect { WorkerConfig.new( temp_file.path ) }.to raise_error( "Invalid polling_timing type given ('fubar'). Must be one of [\"absolute\", \"randomized\"]." )
+        withAdvancedTempConfigBasedOnAttributes( @specific_attributes ) do |temp_file|
+          expect { WorkerConfig.new( temp_file.path ) }.to raise_error( "Invalid polling_timing given ('fubar'). Must be one of [\"absolute\", \"randomized\"]." )
         end
 
       end
 
       it "should honor specific values being provided for polling_delay_seconds" do
 
-        ConfigHelpers.withAdvancedTempConfigBasedOnAttributes( @specific_attributes ) do |temp_file|
+        withAdvancedTempConfigBasedOnAttributes( @specific_attributes ) do |temp_file|
           conf = WorkerConfig.new( temp_file.path )
           conf[ 'polling_delay_seconds' ].should == 10.0
         end
@@ -128,7 +128,7 @@ describe "Worker Configuration Files" do
 
       it "should honor specific values being provided for polling_delay_stdev" do
 
-        ConfigHelpers.withAdvancedTempConfigBasedOnAttributes( @specific_attributes ) do |temp_file|
+        withAdvancedTempConfigBasedOnAttributes( @specific_attributes ) do |temp_file|
           conf = WorkerConfig.new( temp_file.path )
           conf[ 'polling_delay_stdev' ].should == 3.0
         end
@@ -139,7 +139,7 @@ describe "Worker Configuration Files" do
 
         @specific_attributes[ 'polling_delay_seconds' ] = 'fubar'
 
-        ConfigHelpers.withAdvancedTempConfigBasedOnAttributes( @specific_attributes ) do |temp_file|
+        withAdvancedTempConfigBasedOnAttributes( @specific_attributes ) do |temp_file|
           expect { WorkerConfig.new( temp_file.path ) }.to raise_error( "invalid value for Float(): \"fubar\"" )
         end
 
@@ -149,7 +149,7 @@ describe "Worker Configuration Files" do
 
         @specific_attributes[ 'polling_delay_stdev' ] = 'fubar'
 
-        ConfigHelpers.withAdvancedTempConfigBasedOnAttributes( @specific_attributes ) do |temp_file|
+        withAdvancedTempConfigBasedOnAttributes( @specific_attributes ) do |temp_file|
           expect { WorkerConfig.new( temp_file.path ) }.to raise_error( "invalid value for Float(): \"fubar\"" )
         end
 
@@ -163,7 +163,7 @@ describe "Worker Configuration Files" do
 
     it  "should not default any polling values" do
 
-      ConfigHelpers.withAdvancedTempConfigBasedOnAttributes( @all_attributes_signals ) do |temp_file|
+      withAdvancedTempConfigBasedOnAttributes( @all_attributes_signals ) do |temp_file|
         conf = WorkerConfig.new( temp_file.path )
         conf[ 'polling_timing' ].should be_nil
         conf[ 'polling_delay_seconds' ].should be_nil
@@ -179,7 +179,7 @@ describe "Worker Configuration Files" do
       specific_attributes[ 'polling_delay_seconds' ] = 'bar'
       specific_attributes[ 'polling_delay_stdev'   ] = 'bam'
 
-      ConfigHelpers.withAdvancedTempConfigBasedOnAttributes( specific_attributes ) do |temp_file|
+      withAdvancedTempConfigBasedOnAttributes( specific_attributes ) do |temp_file|
         conf = WorkerConfig.new( temp_file.path )
         conf[ 'polling_timing'        ].should == 'foo'
         conf[ 'polling_delay_seconds' ].should == 'bar'

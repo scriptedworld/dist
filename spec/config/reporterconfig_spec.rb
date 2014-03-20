@@ -1,9 +1,9 @@
 require 'spec_helper'
 require 'config/reporterconfig'
 
-require 'Tempfile'
-
 describe "Reporter Configuration Files" do
+
+  include ConfigHelpers
 
   before( :all ) do
 
@@ -11,13 +11,13 @@ describe "Reporter Configuration Files" do
     @all_attributes[ 'report_interval_seconds' ] = 10.0
 
     @temp_files = Hash.new
-    @temp_files[ 'all'   ] = ConfigHelpers.createAdvancedTempConfig( 'all', @all_attributes )
-    @temp_files[ 'empty' ] = ConfigHelpers.createAdvancedTempConfig( 'empty' )
+    @temp_files[ 'all'   ] = createAdvancedTempConfig( 'all', @all_attributes )
+    @temp_files[ 'empty' ] = createAdvancedTempConfig( 'empty' )
 
   end
 
   after( :all ) do
-    ConfigHelpers.cleanupTempConfigList( @temp_files.values )
+    cleanupTempConfigList( @temp_files.values )
   end
 
   it "should be derived from BaseConfig" do
@@ -38,7 +38,7 @@ describe "Reporter Configuration Files" do
     specific_attributes = Hash.new
     specific_attributes[ 'report_interval_seconds' ] = 'foo'
 
-    ConfigHelpers.withAdvancedTempConfigBasedOnAttributes( specific_attributes ) do |temp_file|
+    withAdvancedTempConfigBasedOnAttributes( specific_attributes ) do |temp_file|
       expect { ReporterConfig.new( temp_file.path ) }.to raise_error( "invalid value for Float(): \"foo\"" )
     end
 

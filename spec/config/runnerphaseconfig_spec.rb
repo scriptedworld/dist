@@ -3,6 +3,8 @@ require 'config/runnerconfig'
 
 describe "Runner Phase Configuration Objects" do
 
+  include ConfigHelpers
+
   before( :all ) do
 
     @all_attributes_base = Hash.new
