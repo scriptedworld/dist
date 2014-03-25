@@ -11,7 +11,8 @@ end
 
 require 'rspec/expectations'
 
+require 'dist/helpers'
 require 'config_helpers'
 require 'debug_helpers'
-require 'config/baseconfig'
 
+require 'dist/config/baseconfig'

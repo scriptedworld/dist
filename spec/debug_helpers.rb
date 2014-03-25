@@ -1,29 +1,37 @@
 
-module DebugHelpers
+require 'dist/helpers'
 
-  def presetDebugStateAndValidateResult( pre_debug_state, expected_debug_state, &block )
+module Dist
 
-    old_state = $DEBUG
-    $DEBUG = pre_debug_state
+  module DebugHelpers
 
-    yield
+    include Helpers
 
-    result = ( $DEBUG == expected_debug_state )
+    def presetDebugStateAndValidateResult( pre_debug_state, expected_debug_state, &block )
 
-    $DEBUG = old_state
+      old_state = $DEBUG
+      $DEBUG = pre_debug_state
 
-    result
+      yield
 
-  end
+      result = ( $DEBUG == expected_debug_state )
 
-  def testDebugState( before_state, after_state, config_file_path, config_class = BaseConfig )
-    expect {
-      presetDebugStateAndValidateResult( before_state, after_state ) do
-        withTempFileFromAttributes( config_attributes ) do |temp_file|
-          config_class.new( temp_file.path )
+      $DEBUG = old_state
+
+      result
+
+    end
+
+    def testDebugState( before_state, after_state, config_file_path, config_class = BaseConfig )
+      expect {
+        presetDebugStateAndValidateResult( before_state, after_state ) do
+          withTempFileFromAttributes( config_attributes ) do |temp_file|
+            config_class.new( temp_file.path )
+          end
         end
-      end
-    }.to be_true
+      }.to be_true
+    end
+
   end
 
 end

@@ -1,11 +1,12 @@
 
 require 'spec_helper'
-require 'config/baseconfig'
+require 'dist/config/baseconfig'
 
 module Dist
 
   describe "Base Configuration" do
 
+    include Helpers
     include ConfigHelpers
     include DebugHelpers
 

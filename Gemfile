@@ -1,10 +1,6 @@
 source "https://rubygems.org"
 
-gem 'json'
-gem 'awesome_print'
-gem 'redis'
-gem 'hiredis'
-gem 'pry'
+gemspec
 
 group :development, :test do
   gem 'rake'
@@ -19,7 +15,6 @@ group :test do
   gem 'flay'
   gem 'flog'
   gem 'rubocop'
-  gem 'reek'
 
 end
 
