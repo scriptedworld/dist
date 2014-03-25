@@ -19,7 +19,9 @@ module DebugHelpers
   def testDebugState( before_state, after_state, config_file_path, config_class = BaseConfig )
     expect {
       presetDebugStateAndValidateResult( before_state, after_state ) do
-        config_class.new( config_file_path )
+        withTempFileFromAttributes( config_attributes ) do |temp_file|
+          config_class.new( temp_file.path )
+        end
       end
     }.to be_true
   end

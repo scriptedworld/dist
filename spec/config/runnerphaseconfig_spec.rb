@@ -35,16 +35,14 @@ describe "Runner Phase Configuration Objects" do
   end
 
   it "should NOT be derived from BaseConfig" do
-
     expect( RunnerPhaseConfig.new( {} ) ).to_not be_a_kind_of( BaseConfig )
-
   end
 
   it "should instantiate with any input." do
 
-    [ true, 1, [], 3.0, Object.new, {}, nil ].each do |curr_test_value|
-      expect { 
-        RunnerPhaseConfig.new( curr_test_value ) 
+    [ true, 1, [], 3.0, Object.new, {} ].each do |curr_test_value|
+      expect {
+        RunnerPhaseConfig.new( curr_test_value )
       }.to_not raise_error()
     end
 
@@ -55,15 +53,13 @@ describe "Runner Phase Configuration Objects" do
     it "should ensure nil & non-hash values weren't provided during initialization." do
 
       # Nil gets a special message.
-      expect {
-        RunnerPhaseConfig.new( nil ).validate()
-      }.to raise_error( "Provided argument is nil." )
+      conf = RunnerPhaseConfig.new( nil )
+      expect { conf.validate() }.to raise_error( "Provided argument is nil." )
 
       # Everything else gets a this-isnt-a-hash message.
       [ 1, [], 3.0, Object.new ].each do |curr_test_value|
-        expect {
-          RunnerPhaseConfig.new( curr_test_value ).validate()
-        }.to raise_error( "Provided argument is not a hash." )
+        conf = RunnerPhaseConfig.new( curr_test_value )
+        expect { conf.validate() }.to raise_error( "Provided argument is not a hash." )
       end
 
     end
@@ -71,9 +67,10 @@ describe "Runner Phase Configuration Objects" do
     it "should ensure the required values are all provided" do
 
       [ @all_attributes_with_count, @all_attributes_with_duration ].each do |curr_attrs|
-        expect {
-          RunnerPhaseConfig.new( curr_attrs ).validate()
-        }.to_not raise_error()
+
+        conf = RunnerPhaseConfig.new( curr_attrs )
+        expect { conf.validate() }.to_not raise_error()
+
       end
 
       [ @all_attributes_with_duration, @all_attributes_with_count ].each do |curr_attr_coll|
@@ -85,25 +82,21 @@ describe "Runner Phase Configuration Objects" do
           expected_message = "Key #{ curr_key } missing."
           expected_message = "Either total_count or phase_duration must be provided for each phase definition." if ( ( curr_key == 'total_count' ) || ( curr_key == 'phase_duration' ) || ( curr_key == 'phase_duration_units' ) )
 
-          expect {
-            RunnerPhaseConfig.new( curr_attrs ).validate()
-          }.to raise_error( expected_message )
-
+          conf = RunnerPhaseConfig.new( curr_attrs )
+          expect { conf.validate() }.to raise_error( expected_message )
         end
 
       end
 
-      expect {
-        RunnerPhaseConfig.new( @empty ).validate()
-      }.to raise_error( 'Key name missing.' )
+      conf = RunnerPhaseConfig.new( {} )
+      expect { conf.validate() }.to raise_error( "Key name missing." )
 
     end
 
     it "should allow an either-or-both behavior for total_count and phase_duration" do
 
-      expect {
-        RunnerPhaseConfig.new( @all_attributes_with_both ).validate()
-      }.to_not raise_error()
+      conf = RunnerPhaseConfig.new( @all_attributes_with_both )
+      expect { conf.validate() }.to_not raise_error()
 
     end
 
@@ -112,16 +105,16 @@ describe "Runner Phase Configuration Objects" do
       attrs_without_phase_duration = @all_attributes_with_both.dup
       attrs_without_phase_duration.delete( 'phase_duration' )
 
-      cfg = RunnerPhaseConfig.new( attrs_without_phase_duration )
-      cfg.validate()
-      expect( cfg.attributes.keys ).to_not include( 'phase_duration', 'phase_duration_units' )
+      conf = RunnerPhaseConfig.new( attrs_without_phase_duration )
+      conf.validate()
+      expect( conf.attributes.keys ).to_not include( 'phase_duration', 'phase_duration_units' )
 
       attrs_without_phase_duration_units = @all_attributes_with_both.dup
       attrs_without_phase_duration_units.delete( 'phase_duration_units' )
 
-      cfg = RunnerPhaseConfig.new( attrs_without_phase_duration_units )
-      cfg.validate()
-      expect( cfg.attributes.keys ).to_not include( 'phase_duration', 'phase_duration_units' )
+      conf = RunnerPhaseConfig.new( attrs_without_phase_duration_units )
+      conf.validate()
+      expect( conf.attributes.keys ).to_not include( 'phase_duration', 'phase_duration_units' )
 
     end
 

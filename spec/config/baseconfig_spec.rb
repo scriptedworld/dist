@@ -11,7 +11,7 @@ module Dist
 
     before( :all ) do
 
-      @temp_files = Hash.new
+      @attribute_hashes = Hash.new
 
       junk_attributes = Hash.new
       junk_attributes[ 'non_required_key' ] = 'non required value'
@@ -26,99 +26,67 @@ module Dist
 
       @all_attributes.merge! junk_attributes
 
-      @temp_files[ 'all' ] = createTempConfig( 'all', @all_attributes )
+      @attribute_hashes[ :all ] = @all_attributes
 
       @all_attributes.each_key do |curr_key|
 
         curr_partial_attributes = @all_attributes.dup
         curr_partial_attributes.delete( curr_key )
 
-        @temp_files[ curr_key ] = createTempConfig( curr_key, curr_partial_attributes )
+        @attribute_hashes[ curr_key ] = curr_partial_attributes
 
       end
 
-      @temp_files[ 'empty' ] = createTempConfig( 'empty', junk_attributes )
-
       debug_true = @all_attributes.dup
       debug_true[ 'debug' ] = true
-
-      @temp_files[ 'debug_true' ] = createTempConfig( 'debug_true', debug_true )
+      @attribute_hashes[ :debug_true ] = debug_true
 
       debug_false = @all_attributes.dup
       debug_false[ 'debug' ] = true
+      @attribute_hashes[ :debug_false ] = debug_false
 
-      @temp_files[ 'debug_false' ] = createTempConfig( 'debug_false', debug_false )
-    end
-
-    after( :all ) do
-      cleanupTempConfigList( @temp_files.values )
     end
 
     it "should instaniate without error when all required attributes are provided." do
 
-      conf = BaseConfig.new( @temp_files[ 'all' ].path )
-
-      @all_attributes.each_pair do |k,v|
-        conf[ k ].should == v
+      withConfig( @all_attributes, BaseConfig ) do |conf|
+        @all_attributes.each_pair do |k,v|
+          expect( conf[ k ] ).to eq( v )
+        end
       end
 
     end
 
     it "should raise an exception when all of the required attributes are missing." do
 
-      expect { BaseConfig.new( @temp_files[ 'empty' ].path ) }.to raise_error( /Key (\S+) missing./ )
+      expectNewConfigToRaiseError( {}, BaseConfig, /Key (\S+) missing./ )
 
     end
 
     it "should raise an exception when any of the required attributes are missing." do
 
-      required_attributes = @temp_files.keys - [ 'all', 'empty', 'non_required_key', 'debug_true', 'debug_false' ]
+      required_attributes = @attribute_hashes.keys.reject! { |item| item.instance_of?( Symbol ) }
+
+      required_attributes -= [ 'non_required_key' ]
 
       required_attributes.each do |curr_attribute|
-        expect { BaseConfig.new( @temp_files[ curr_attribute ].path ) }.to raise_error( /Key #{ curr_attribute } missing./ )
+        expectNewConfigToRaiseError( @attribute_hashes[ curr_attribute ], BaseConfig, /Key #{ curr_attribute } missing./ )
       end
 
     end
 
-    describe "affects $DEBUG" do
+    it "affects $DEBUG when provided & true." do
+      testDebugState( true, true, @attribute_hashes[ :debug_true ] )
+      testDebugState( false, true, @attribute_hashes[ :debug_false ] )
+    end
 
-      describe "should NOT affect the value of $DEBUG when 'debug' attribute doesn't exist" do
-
-        it "should leave $DEBUG=true alone." do
-          testDebugState( true, true, @temp_files[ 'all' ].path )
-        end
-
-        it "should leave $DEBUG=false alone." do
-          testDebugState( false, false, @temp_files[ 'all' ].path )
-        end
-
-      end
-
-      describe "should NOT affect the value of $DEBUG when 'debug' attribute is false" do
-
-        it "should leave $DEBUG=true alone." do
-          testDebugState( true, true, @temp_files[ 'debug_false' ].path )
-        end
-
-        it "should leave $DEBUG=false alone." do
-          testDebugState( false, false, @temp_files[ 'debug_false' ].path )
-        end
-
-      end
-
-      describe "should affect the value of $DEBUG when 'debug' attribute is true" do
-
-        it "should ensure that $DEBUG stays set when previously true." do
-          testDebugState( true, true, @temp_files[ 'debug_true' ].path )
-        end
-
-        it "should ensure that $DEBUG gets set when previously false." do
-          testDebugState( false, true, @temp_files[ 'debug_true' ].path )
-        end
-
-      end
-
-
+    it "does not affect $DEBUG when not provided or false." do
+      # Calls with debug not provided by config.
+      testDebugState( true, true, @attribute_hashes[ :all ] )
+      testDebugState( false, false, @attribute_hashes[ :all ] )
+      # Calls with debug provided and == false
+      testDebugState( true, true, @attribute_hashes[ :debug_false ] )
+      testDebugState( false, false, @attribute_hashes[ :debug_false ] )
     end
 
   end

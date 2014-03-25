@@ -9,10 +9,11 @@ describe "Runner Configuration Files" do
 
     @optional_params = %w( continuous use_poisson )
 
-    base_attributes_temp_file = createTempConfig( 'base_attributes', { foo: 'bar' } )
+    job_base_attributes = { foo: 'bar' }
+    @base_attributes_temp_file = createTempConfigFile( 'base_attributes', job_base_attributes )
 
     @all_attributes = Hash.new
-    @all_attributes[ 'base_attributes_file_path' ] = base_attributes_temp_file.path
+    @all_attributes[ 'base_attributes_file_path' ] = @base_attributes_temp_file.path
     @all_attributes[ 'phases'                    ] = [
       { 'name' => 'name',
         'description' => 'description',
@@ -21,55 +22,56 @@ describe "Runner Configuration Files" do
       }
     ]
 
-    @temp_files = Hash.new
-    @temp_files[ 'all'             ] = createAdvancedTempConfig( 'all', @all_attributes )
-    @temp_files[ 'empty'           ] = createAdvancedTempConfig( 'empty' )
-    @temp_files[ 'base_attributes' ] = base_attributes_temp_file
+    @attribute_hashes = Hash.new
+    @attribute_hashes[ :all ] = @all_attributes
+    @attribute_hashes[ :empty ] = Hash.new
 
     @all_attributes.keys().each do |curr_key|
 
       temp_hash = @all_attributes.dup()
       temp_hash.delete( curr_key )
 
-      @temp_files[ curr_key ] = createAdvancedTempConfig( curr_key, temp_hash )
+      @attribute_hashes[ curr_key ] = temp_hash
 
     end
 
   end
 
   after( :all ) do
-    cleanupTempConfigList( @temp_files.values )
+    cleanupTempConfigFile( @base_attributes_temp_file )
   end
 
   it "should be derived from BaseConfig" do
 
-    conf = RunnerConfig.new( @temp_files[ 'all' ].path )
-    conf.should be_a( BaseConfig )
+    withConfig( @attribute_hashes[ :all ], RunnerConfig, :include_base_attributes => true ) do |conf|
+      expect( conf ).to be_a_kind_of( BaseConfig )
+    end
 
   end
 
   it "requires the base_attributes_file_path parameter" do
 
-    expect { RunnerConfig.new( @temp_files[ 'base_attributes_file_path' ].path ) }.to raise_error( "Key base_attributes_file_path missing." )
+    expectNewConfigToRaiseError( @attribute_hashes[ :empty ], RunnerConfig, "Key base_attributes_file_path missing.", :include_base_attributes => true )
 
   end
 
   it "requires a phases array of RunnerPhaseConfig objects." do
 
-    expect { RunnerConfig.new( @temp_files[ 'phases' ].path ) }.to raise_error( "Key phases missing." )
+    expectNewConfigToRaiseError( @attribute_hashes[ 'phases' ], RunnerConfig, "Key phases missing.", :include_base_attributes => true )
 
-    specific_attributes = @all_attributes.dup
+    specific_attributes = @attribute_hashes[ 'phases' ].dup()
     specific_attributes[ 'phases' ] = Hash.new
 
-    withAdvancedTempConfigBasedOnAttributes( specific_attributes ) do |temp_file|
-      expect { RunnerConfig.new( temp_file.path ) }.to raise_error( "Phases array incorrectly defined." )
-    end
+    expectNewConfigToRaiseError( specific_attributes, RunnerConfig, "Phases array incorrectly defined.", :include_base_attributes => true )
 
   end
 
   it "handles the abscence of optional parameters ( 'continuous' & 'use_poisson' ) (default to false)." do
-    cfg = RunnerConfig.new( @temp_files[ 'all' ].path )
-    @optional_params.each { |optional_param| expect( cfg[ optional_param ] ).to be_false() }
+    withConfig( @attribute_hashes[ :all ], RunnerConfig, :include_base_attributes => true ) do |conf|
+      @optional_params.each do |optional_param|
+        expect( conf[ optional_param ] ).to be_false()
+      end
+    end
   end
 
   it "handles ensuring the boolean nature of the optional parameters." do
@@ -79,8 +81,8 @@ describe "Runner Configuration Files" do
       specific_attributes = @all_attributes.dup
       specific_attributes[ optional_param ] = true
 
-      withAdvancedTempConfigBasedOnAttributes( specific_attributes ) do |temp_file|
-        RunnerConfig.new( temp_file.path )[ optional_param ].should be_true()
+      withConfig( specific_attributes, RunnerConfig, :include_base_attributes => true ) do |conf|
+        expect( conf[ optional_param ] ).to be_true()
       end
 
       # ANYTHING that is not an Instance of TrueClass is false.
@@ -88,8 +90,8 @@ describe "Runner Configuration Files" do
 
         specific_attributes[ optional_param ] = curr_false_value
 
-        withAdvancedTempConfigBasedOnAttributes( specific_attributes ) do |temp_file|
-          RunnerConfig.new( temp_file.path )[ optional_param ].should be_false()
+        withConfig( specific_attributes, RunnerConfig, :include_base_attributes => true ) do |conf|
+          expect( conf[ optional_param ] ).to be_false()
         end
 
       end
@@ -101,12 +103,14 @@ describe "Runner Configuration Files" do
 
   it "creates & validates RunnerPhaseConfig objects for each hash in the phases array." do
     RunnerPhaseConfig.any_instance.should_receive( :validate ).once
-    RunnerConfig.new( @temp_files[ 'all' ].path )
+    withConfig( @attribute_hashes[ :all ], RunnerConfig, :include_base_attributes => true ) do |conf|
+      # Do nothing. #validate should have already been called.
+    end
   end
 
   it "throws an exception during creation if any phase fails to validate." do
     RunnerPhaseConfig.any_instance.should_receive( :validate ) { raise "No!" }
-    expect { RunnerConfig.new( @temp_files[ 'all' ].path ) }.to raise_error( "No!" )
+    expectNewConfigToRaiseError( @attribute_hashes[ :all ], RunnerConfig, "No!", :include_base_attributes => true )
   end
 
 end
