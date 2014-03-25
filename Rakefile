@@ -11,9 +11,6 @@ require 'flog_task'
 require 'rubocop'
 require 'rubocop/rake_task'
 
-require 'reek'
-require 'reek/rake/task'
-
 require 'rspec'
 require 'rspec/core/rake_task'
 
@@ -26,8 +23,6 @@ end
 Rubocop::RakeTask.new( :rubocop ) do |rubocop|
   # nothing to do.
 end
-
-Reek::Rake::Task.new( :reek )
 
 FlayTask.new( :flay ) do |flay|
   flay.dirs = [ '.', 'lib' ]
@@ -43,8 +38,8 @@ RDoc::TagsTask.new do |t|
   # t.tags_file = 'tags'
 end
 
-task :quality   => [ :flog, :flay, :reek, :rubocop ]
-# task :quality   => [ :flog, :flay, :reek ]
+task :quality   => [ :flog, :flay, :rubocop ]
+# task :quality   => [ :flog, :flay ]
 # task :quality => [ :flog, :flay                  ]
 # task :test    => [ :spec, :quality               ]
 

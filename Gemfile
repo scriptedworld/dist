@@ -19,7 +19,6 @@ group :test do
   gem 'flay'
   gem 'flog'
   gem 'rubocop'
-  gem 'reek'
 
 end
 
