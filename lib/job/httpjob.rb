@@ -26,18 +26,19 @@ class HttpJob < Job
     @http.request( request )
   end
 
-  def doGet( url, user, pass, body = nil, headers = {} )
+  def doRequest( request_type, url, user, pass, body = nil, headers = {} )
     uri = URI( url )
-    req = Net::HTTP::Get.new( uri )
+    req = request_type.new( uri )
 
     handleRequest( req, user, pass, body, headers )
   end
 
-  def doPost( url, user, pass, body = nil, headers = {} )
-    uri = URI( url )
-    req = Net::HTTP::Post.new( uri )
+  def doGet( url, user, pass, body = nil, headers = {} )
+    doRequest( Net::HTTP::Get, url, user, pass, body, headers )
+  end
 
-    handleRequest( req, user, pass, body, headers )
+  def doPost( url, user, pass, body = nil, headers = {} )
+    doRequest( Net::HTTP::Post, url, user, pass, body, headers )
   end
 
 end
