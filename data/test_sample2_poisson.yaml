@@ -15,7 +15,7 @@ phases:
     description: Run!
     jobs:
       -
-        job_class: EmptyJob
+        job_class: Dist::EmptyJob
         per_unit: 200
         unit: SECOND
     phase_duration: 600

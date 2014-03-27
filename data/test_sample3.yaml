@@ -15,7 +15,7 @@ phases:
     description: "Long slow test for testing the Reporter."
     jobs:
       -
-        job_class: EmptyJob
+        job_class: Dist::EmptyJob
         per_unit: 1
         unit: SECOND
     total_count: 300

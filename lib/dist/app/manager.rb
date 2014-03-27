@@ -4,11 +4,6 @@ require 'fileutils'
 require 'optparse'
 require 'yaml'
 
-this_dir = File.dirname( __FILE__ )
-$LOAD_PATH << this_dir unless $LOAD_PATH.include? this_dir
-lib_dir = File.join( this_dir, 'lib' )
-$LOAD_PATH << lib_dir unless $LOAD_PATH.include? lib_dir
-
 require 'dist/helpers'
 
 module Dist

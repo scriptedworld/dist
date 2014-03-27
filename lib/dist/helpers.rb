@@ -99,8 +99,8 @@ module Dist
     # Internal function used by getNormalizedRandomNumber
     def rnd_snd
       ( ( ( Kernel.rand * 2.0 ) - 1.0 ) +
-          ( ( Kernel.rand * 2.0 ) - 1.0 ) +
-          ( ( Kernel.rand * 2.0 ) - 1.0 ) )
+        ( ( Kernel.rand * 2.0 ) - 1.0 ) +
+        ( ( Kernel.rand * 2.0 ) - 1.0 ) )
     end
 
     def getNormalizedRandomNumber( mean, stdev )

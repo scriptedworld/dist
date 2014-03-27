@@ -13,7 +13,7 @@ phases:
     description: "First Phase: Low Load, warming things up."
     jobs:
       -
-        job_class: EmptyJob
+        job_class: Dist::EmptyJob
         per_unit: 10
         unit: SECOND
     total_count: 30
@@ -22,7 +22,7 @@ phases:
     description: "Second Phase: More Load, a bit of stress."
     jobs:
       -
-        job_class: EmptyJob
+        job_class: Dist::EmptyJob
         per_unit: 50
         unit: SECOND
     phase_duration: 60
