@@ -1,4 +1,28 @@
+
+
 DIST is a distributed Job Execution Engine.
+
+# Table of Contents
+
+<!-- MarkdownTOC depth=3 -->
+
+- Getting Started.
+- Description of the framework:
+- Description of each script:
+  - Runner:
+  - Reporter:
+  - Manager:
+  - Worker:
+  - Additionally, soon to exist in it's own repo ( dist-graph ) repo: Data.
+- Configuration files:
+  - Common configuration items:
+  - Runner Config File:
+    - Runner Phase Configuration:
+    - Runner Phase Job Configuration:
+  - Reporter Config File:
+  - Worker Config File:
+
+<!-- /MarkdownTOC -->
 
 # Getting Started.
 
@@ -59,13 +83,13 @@ You *should* configure your system to have a high quantity of file descriptors a
 
   Depending on the exit state of the job, the job data will be moved into a final 'BROKEN' or 'COMPLETE' state.
 
-  Worker is invoked providing a worker configuration file ( yaml-based ) as it's only command-line argument. 
+  Worker is invoked providing a worker configuration file ( yaml-based ) as it's only command-line argument.
 
   **NORMALLY** Worker is not invoked directly, but rather is run via the Manager script to start/stop multiple instances at the same time.
 
   ( Example: I tend to run 75 copies of the worker on each of 8 hosts during my test runs. )
 
-## Data:
+## Additionally, soon to exist in it's own repo ( dist-graph ) repo: Data.
 
   Data provides a live web interface to the metrics gathered by the Reporter.
 
@@ -73,3 +97,72 @@ You *should* configure your system to have a high quantity of file descriptors a
 
   Data is not invoked directly, but rather through start_dataserver.sh which starts the data script using the Unicorn web server engine, making it parallelized.
 
+# Configuration files:
+
+  Each of the runnable applications has it's own configuration file definition.
+
+## Common configuration items:
+
+  * `name`: The name of the configuration file. Optionally, you can also add a 'description' value. The name will be logged during the script runtime, but generally exists
+          to help when you have lots of configuration files.
+  * `log_dir`: Where you want log files from the given script to be written to.
+  * `redis_host`: host name or ip to talk to redis.
+  * `redis_port`: port number to talk to redis.
+  * `redis_pass`: redis server auth value. ( specified in your redis config. default provided in the example configs is 'slenderman' )
+  * `debug`: true or false
+
+## Runner Config File:
+
+  The runner configuration file is the most complicated because it has a LOT to deal with.  Beyond the common configuration items two additional configuration values must be provided:
+
+  * `base_attributes_file_path`: this provides a hash of attributes to pre-populate into each job as they are created.
+  * `phases`: an array of phase definitions.
+
+### Runner Phase Configuration:
+
+  Each phase definition requires the following attributes:
+
+  * `name`: The name of the phase.
+  * `description`: The description of the phase.
+  * `jobs`: The array of job definitions to create during the lifetime of the current phase.
+
+  and
+
+  * `total_count`: The total number of jobs which will be inserted during this phase. ( as opposed to `phase_duration` )
+
+  or 
+
+  * `phase_duration`: Numeric element of a timed length for the phase duration ( as opposed to `total_count` )
+  and
+  * `phase_duration_units`: The Units portion of the timed length. Values allowed include [ MILLIS, SECOND, MINUTE, HOUR, DAY, WEEK ]
+
+### Runner Phase Job Configuration:
+
+  Each Job defintion requires 3 attributes:
+
+  * `job_class`: The complete class name of the Dist::Job derived class to instantiate.
+  * `per_unit`: Numeric portion of the rate this job definition should be created at.
+  * `unit`: As with `phase_duration_units` above, values allowed include [ MILLIS, SECOND, MINUTE, HOUR, DAY, WEEK ]
+
+
+## Reporter Config File:
+
+  The reporter configuration file is very basic. Beyond the common configuration values, only one additional attribute is required:
+
+  * `report_interval_seconds`: The number of seconds between iterations of the reporter.
+
+## Worker Config File:
+
+  * `queue_method`: Either 'polling' or 'signals'
+
+  'signals' only works for systems with a relatively low load. There are issues with REDIS switching back and forth between Normal
+  & PubSub mode that causes issues ( unexpected messages during the PubSub wait that clients don't handle ).
+
+  *IF* queue_method == 'polling' then additionally you must specify:
+
+  * `polling_timing`: Either 'absolute' or 'randomized'
+  * `polling_delay_seconds`: Number of seconds between Jobs.READY check in.
+
+  *IF* polling_timing == 'randomized' then additionally you must specify:
+
+  * `polling_delay_stdev` when using randomized timing, how much deviation around the core delay value to use.
