@@ -24,12 +24,13 @@ Gem::Specification.new do |s|
                              'config/*'
                            ]
 
-  s.add_runtime_dependency     'sinatra',       '>= 1.4.4'
+  # s.add_runtime_dependency     'sinatra',       '>= 1.4.4'
+  # s.add_runtime_dependency     'gruff',         '>= 0.5.1'
+
   s.add_runtime_dependency     'json',          '>= 1.8.0', '< 2'
   s.add_runtime_dependency     'awesome_print', '>= 1.1.0'
   s.add_runtime_dependency     'redis',         '>= 3.0.4'
   s.add_runtime_dependency     'hiredis',       '>= 0.4.5'
   s.add_runtime_dependency     'pry',           '>= 0.9.12.2'
-  s.add_runtime_dependency     'gruff',         '>= 0.5.1'
 
 end
