@@ -8,11 +8,11 @@ module Dist
     def initialize
       super
 
-      setItemReadySignalName( 'signal.job.ready' )
-      setNewItemIDKey( 'new.job.number' )
-      setItemPrefix( 'job.' )
-      setStatePrefix( 'jobs.' )
-      setAllowedStates( *( %w( INITIAL READY PROCESSING COMPLETE BROKEN ) ) )
+      set_item_ready_signal_name( 'signal.job.ready' )
+      set_new_item_id_key( 'new.job.number' )
+      set_item_prefix( 'job.' )
+      set_state_prefix( 'jobs.' )
+      set_allowed_states( *( %w( INITIAL READY PROCESSING COMPLETE BROKEN ) ) )
     end
 
   end

@@ -8,9 +8,9 @@ module Dist
     include Helpers
     include Logged
 
-    def getConfigClass
+    def get_config_class
       # This *SHOULD* get overriden in each child of BaseApp ... warn the user if they missed a step.
-      displayDebugMessage( "WARNING: BaseApp#getConfigClass used." )
+      display_debug_message( 'WARNING: BaseApp#get_config_class used.' )
 
       # return the BaseConfig class.
       BaseConfig
@@ -19,24 +19,23 @@ module Dist
     # This should NOT be overriden.
     # TODO: Add code here to make sure that run has NOT been overriden.
     def run
-      loadConfig()
-      instance_run()
+      load_config
+      instance_run
     end
 
     def instance_run
-      raise "This method instance_run must be implemented in all App classes deriving from BaseApp."
+      raise 'This method instance_run must be implemented in all App classes deriving from BaseApp.'
     end
 
-    def loadConfig
+    def load_config
 
-      config_class = getConfigClass()
+      config_class = get_config_class
       $config = config_class.new( ARGV.pop )
 
-      handleRedisConfig( $config[ 'redis_host' ], $config[ 'redis_port' ], $config[ 'redis_pass' ] )
+      handle_redis_config( $config[ 'redis_host' ], $config[ 'redis_port' ], $config[ 'redis_pass' ] )
 
     end
 
   end
 
 end
-

@@ -1,0 +1,38 @@
+---
+# Don't use extra space inside of parens,
+# Part of my coding style, not willing to give it up.
+SpaceInsideParens:
+  Enabled: false
+
+# Don't use extra space inside of brackets,
+# Same as above.
+SpaceInsideBrackets:
+  Enabled: false
+
+# Standard doesn't like when I pad the body of funtions with whitespace.
+# I do so for readability, makes it easier to visually pull apart the wrapping 
+# functionality with the body.
+EmptyLinesAroundBody:
+  Enabled: false
+
+LineLength:
+  Enabled: false
+  Max: 120
+
+MethodLength:
+  Enabled: false
+
+ClassLength:
+  Enabled: false
+
+Documentation:
+  Enabled: false
+
+# This one says to use fail instead of raise. Not as readable.
+SignalException:
+  Enabled: false
+
+# I don't prefer alias_method to alias.
+Alias:
+  Enabled: false
+

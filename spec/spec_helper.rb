@@ -6,7 +6,7 @@ $LOAD_PATH << lib_dir unless $LOAD_PATH.include? lib_dir
 
 require 'simplecov'
 SimpleCov.start do
-  add_filter "/spec/"
+  add_filter '/spec/'
 end
 
 require 'rspec/expectations'

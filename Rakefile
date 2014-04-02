@@ -36,12 +36,11 @@ RDoc::TagsTask.new do |t|
   t.tag_style = 'vim'  # default
 end
 
-task :quality   => [ :flog, :flay, :rubocop ]
+task quality: [ :flog, :flay, :rubocop ]
 
-task :test => :spec
+task test: :spec
 
-task :default => :test
+task default: :test
 
 # Last thing, invoke the tags task EVERY time we run this Rakefile.
-Rake::Task[ "tags" ].invoke
-
+# Rake::Task[ 'tags' ].invoke

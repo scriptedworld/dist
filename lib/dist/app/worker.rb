@@ -6,48 +6,49 @@ module Dist
 
   class WorkerApp < BaseApp
 
-    def waitForJobViaSignalling
-      displayDebugMessage( 'No jobs ready, waiting for signal.' )
-      @j.waitForItemReadySignal()
+    def wait_for_job_via_signalling
+      display_debug_message( 'No jobs ready, waiting for signal.' )
+      @j.wait_for_item_ready_signal
     end
 
-    def waitForJobViaPolling
-      waitSeconds( $config[ 'polling_delay_seconds' ], ( $config[ 'polling_timing' ] == 'absolute' ), $config[ 'polling_delay_stdev' ] )
+    def wait_for_job_via_polling
+      wait_seconds( $config[ 'polling_delay_seconds' ], ( $config[ 'polling_timing' ] == 'absolute' ), $config[ 'polling_delay_stdev' ] )
     end
 
-    def getReadyJob
+    def get_ready_job
 
-      parts = @j.getItemIDFromState( 'READY' )
+      parts = @j.get_item_id_from_state( 'READY' )
 
       job_id = parts.nil? ? nil : parts[0]
       output = nil
 
-      unless( ( job_id.is_a?( String ) ) and ( job_id.start_with?( @j.getItemPrefix() ) ) )
+      if ( job_id.is_a?( String ) ) && ( job_id.start_with?( @j.get_item_prefix ) )
 
-        # See below, waitForJob is an alias.
-        waitForJob()
-
-      else
-
-        job_attributes = @j.loadItem( job_id )
+        job_attributes = @j.load_item( job_id )
         job_class = job_attributes[ 'job_class' ]
 
-        job_klass = Object::const_get( job_class )
+        job_klass = Object.const_get( job_class )
         raise "Inappropriate job_class provided: #{ job_class }" unless job_klass.ancestors.include?( Job )
 
         # Since I've already loaded the attributes for this job, I don't need to do
         # it again. Build our Job object instead of letting the constructor
         # duplicate the work done above.
-        output = job_klass.new()
-        output.setItemID( job_id )
-        output.setAttributes( job_attributes )
+        output = job_klass.new
+        output.set_item_id( job_id )
+        output.set_attributes( job_attributes )
+
+      else
+
+        # See below, waitForJob is an alias.
+        waitForJob
 
       end
 
       output
+
     end
 
-    def getConfigClass
+    def get_config_class
       WorkerConfig
     end
 
@@ -56,29 +57,29 @@ module Dist
       # NOTE: Here we pull a rubyism ... replace watForJob with the correct method
       #       based on configuration. This way, when we're in the middle of handling
       #       jobs, we don't have to check this value each time.
-      case( $config[ 'queue_method' ] )
+      case ( $config[ 'queue_method' ] )
       when 'signals' then
-        alias :waitForJob :waitForJobViaSignalling
+        alias :waitForJob :wait_for_job_via_signalling
       when 'polling' then
-        alias :waitForJob :waitForJobViaPolling
+        alias :waitForJob :wait_for_job_via_polling
       end
 
       @j = JobStore.new
 
-      while( true ) do
+      loop do
 
         begin
 
-          job = getReadyJob()
-          job.handleLifecycle() unless job.nil?
+          job = get_ready_job
+          job.handle_lifecycle unless job.nil?
 
         rescue => e
 
           # Show the error on stderr.
-          displayErrorMessage( e.message )
-          displayErrorMessage( e.backtrace )
+          display_error_message( e.message )
+          display_error_message( e.backtrace )
 
-          if( $DEBUG )
+          if $DEBUG
             require 'pry'
             binding.pry
           end
@@ -97,4 +98,3 @@ module Dist
   end
 
 end
-

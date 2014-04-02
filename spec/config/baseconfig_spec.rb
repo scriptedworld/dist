@@ -4,7 +4,7 @@ require 'dist/config/baseconfig'
 
 module Dist
 
-  describe "Base Configuration" do
+  describe 'Base Configuration' do
 
     include Helpers
     include ConfigHelpers
@@ -48,46 +48,46 @@ module Dist
 
     end
 
-    it "should instaniate without error when all required attributes are provided." do
+    it 'should instaniate without error when all required attributes are provided.' do
 
-      withConfig( @all_attributes, BaseConfig ) do |conf|
-        @all_attributes.each_pair do |k,v|
+      with_config( @all_attributes, BaseConfig, disable_base_attributes: true ) do |conf|
+        @all_attributes.each_pair do |k, v|
           expect( conf[ k ] ).to eq( v )
         end
       end
 
     end
 
-    it "should raise an exception when all of the required attributes are missing." do
+    it 'should raise an exception when all of the required attributes are missing.' do
 
-      expectNewConfigToRaiseError( {}, BaseConfig, /Key (\S+) missing./ )
+      expect_new_config_to_raise_error( {}, BaseConfig, /Key (\S+) missing./, disable_base_attributes: true )
 
     end
 
-    it "should raise an exception when any of the required attributes are missing." do
+    it 'should raise an exception when any of the required attributes are missing.' do
 
       required_attributes = @attribute_hashes.keys.reject! { |item| item.instance_of?( Symbol ) }
 
       required_attributes -= [ 'non_required_key' ]
 
       required_attributes.each do |curr_attribute|
-        expectNewConfigToRaiseError( @attribute_hashes[ curr_attribute ], BaseConfig, /Key #{ curr_attribute } missing./ )
+        expect_new_config_to_raise_error( @attribute_hashes[ curr_attribute ], BaseConfig, /Key #{ curr_attribute } missing./, disable_base_attributes: true )
       end
 
     end
 
-    it "affects $DEBUG when provided & true." do
-      testDebugState( true, true, @attribute_hashes[ :debug_true ] )
-      testDebugState( false, true, @attribute_hashes[ :debug_false ] )
+    it 'affects $DEBUG when provided & true.' do
+      test_debug_state( true, true, @attribute_hashes[ :debug_true ] )
+      test_debug_state( false, true, @attribute_hashes[ :debug_false ] )
     end
 
-    it "does not affect $DEBUG when not provided or false." do
+    it 'does not affect $DEBUG when not provided or false.' do
       # Calls with debug not provided by config.
-      testDebugState( true, true, @attribute_hashes[ :all ] )
-      testDebugState( false, false, @attribute_hashes[ :all ] )
+      test_debug_state( true, true, @attribute_hashes[ :all ] )
+      test_debug_state( false, false, @attribute_hashes[ :all ] )
       # Calls with debug provided and == false
-      testDebugState( true, true, @attribute_hashes[ :debug_false ] )
-      testDebugState( false, false, @attribute_hashes[ :debug_false ] )
+      test_debug_state( true, true, @attribute_hashes[ :debug_false ] )
+      test_debug_state( false, false, @attribute_hashes[ :debug_false ] )
     end
 
   end

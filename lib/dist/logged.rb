@@ -9,27 +9,25 @@ module Dist
       self.class.to_s
     end
 
-    def displayMessage( level, msg )
-      get_logger_collection().each do |curr_logger|
+    def display_message( level, msg )
+      get_logger_collection.each do |curr_logger|
         curr_logger.send( level, logging_name ) { msg }
       end
     end
 
-    def displayErrorMessage( msg )
-      displayMessage( :error, msg )
+    def display_error_message( msg )
+      display_message( :error, msg )
     end
 
-    def displayDebugMessage( msg )
-      displayMessage( :debug, msg )
+    def display_debug_message( msg )
+      display_message( :debug, msg )
     end
 
     def get_logger_collection
 
-      if( $loggers.nil? )
-        $loggers = Hash.new
-      end
+      $loggers = {} if $loggers.nil?
 
-      if( ! $loggers.include?( logging_name ) )
+      unless $loggers.include?( logging_name )
         curr_logger_array = []
 
         basic_formatter = Logger::Formatter.new
@@ -49,7 +47,7 @@ module Dist
 
         curr_logger_array << std_logger
 
-        if( ( ! $config.nil? ) && $config.include?( 'log_dir' ) )
+        if ( ! $config.nil? ) && $config.include?( 'log_dir' )
 
           # FIXME: Should probably include PID in the log file name so that
           #        multiple scripts using things like Job or JobStore don't

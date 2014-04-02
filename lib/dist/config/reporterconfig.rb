@@ -8,12 +8,10 @@ module Dist
     def validate
       super
 
-      validateKeysExist( @attributes, *( %w( report_interval_seconds ) ) )
+      validate_keys_exist( @attributes, *( %w( report_interval_seconds ) ) )
       @attributes[ 'report_interval_seconds' ] = Float( @attributes[ 'report_interval_seconds' ] )
     end
 
   end
 
 end
-
-
