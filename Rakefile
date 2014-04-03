@@ -14,6 +14,7 @@ require 'rubocop/rake_task'
 require 'rspec'
 require 'rspec/core/rake_task'
 
+require 'rdoc/task'
 require 'rdoc/tags_task'
 
 dirs = [ '.', 'lib' ]
@@ -36,9 +37,20 @@ RDoc::TagsTask.new do |t|
   t.tag_style = 'vim'  # default
 end
 
+RDoc::Task.new do |t|
+  t.rdoc_dir = './docs'
+  t.rdoc_files.include( 'lib/**/*.rb' )
+end
+
+RDoc::TagsTask.new
+
 task quality: [ :flog, :flay, :rubocop ]
 
 task test: :spec
 
 task default: :test
+
+`rm -rf .rdoc docs`
+`rdoc --include=./lib --output=docs`
+`rdoc --format=tags --tag-style=vim`
 
