@@ -25,11 +25,11 @@ module Dist
       @redis.auth( @pass )
     end
 
-    def set_timestamp( timestamp )
+    def timestamp=( timestamp )
       @stats[ 'timestamp' ] = timestamp
     end
 
-    def get_systemwide_stats
+    def calc_systemwide_stats
       raise 'Not connected to Redis.' if @redis.nil?
 
       @stats[ 'redis_transaction_count' ] = @redis.info[ 'total_commands_processed' ].to_i
@@ -196,7 +196,7 @@ module Dist
 
   class ReporterApp < BaseApp
 
-    def get_config_class
+    def config_class
       ReporterConfig
     end
 
@@ -212,7 +212,7 @@ module Dist
         display_debug_message( "Processing ... #{ start_time }" )
 
         s = StatsContainer.new
-        s.configure_redis( $config[ 'redis_host' ], $config[ 'redis_port' ], $config[ 'redis_pass' ] )
+        s.configure_redis( @config[ 'redis_host' ], @config[ 'redis_port' ], @config[ 'redis_pass' ] )
 
         # Clean up an stale metrics data in REDIS.
         if first_run
@@ -220,9 +220,9 @@ module Dist
           first_run = false
         end
 
-        s.set_timestamp( start_time )
+        s.timestamp = start_time
 
-        s.get_systemwide_stats
+        s.calc_systemwide_stats
 
         %w( COMPLETE BROKEN ).each do |curr_state|
           s.calc_stats_for_job_state( curr_state )
@@ -233,7 +233,7 @@ module Dist
         s.save
 
         work_completed_time = Time.now.to_f - start_time
-        sleep_time = $config[ 'report_interval_seconds' ] - work_completed_time
+        sleep_time = @config[ 'report_interval_seconds' ] - work_completed_time
         sleep( sleep_time )
 
       end

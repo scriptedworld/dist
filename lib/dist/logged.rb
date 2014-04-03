@@ -1,16 +1,22 @@
 
+require 'fileutils'
+
 require 'dist/helpers'
 
 module Dist
 
   module Logged
 
+    def self.loggers
+      @loggers ||= {}
+    end
+
     def logging_name
       self.class.to_s
     end
 
     def display_message( level, msg )
-      get_logger_collection.each do |curr_logger|
+      logger_collection.each do |curr_logger|
         curr_logger.send( level, logging_name ) { msg }
       end
     end
@@ -23,11 +29,11 @@ module Dist
       display_message( :debug, msg )
     end
 
-    def get_logger_collection
+    def logger_collection
 
-      $loggers = {} if $loggers.nil?
+      loggers = Logged.loggers
 
-      unless $loggers.include?( logging_name )
+      unless loggers.include?( logging_name )
         curr_logger_array = []
 
         basic_formatter = Logger::Formatter.new
@@ -47,12 +53,15 @@ module Dist
 
         curr_logger_array << std_logger
 
-        if ( ! $config.nil? ) && $config.include?( 'log_dir' )
+        if ENV.key?( 'DIST_LOG_DIR' )
+
+          log_dir_path = ENV[ 'DIST_LOG_DIR' ]
+          FileUtils.mkpath( log_dir_path )
 
           # FIXME: Should probably include PID in the log file name so that
           #        multiple scripts using things like Job or JobStore don't
           #        mangle each others log files.
-          log_file = File.new( File.join( $config[ 'log_dir' ], "#{ logging_name }.log" ), 'w+' )
+          log_file = File.new( File.join( log_dir_path, "#{ logging_name }.log" ), 'w+' )
           file_logger = Logger.new( log_file )
 
           file_logger.formatter = proc do |severity, datetime, progname, msg|
@@ -69,10 +78,10 @@ module Dist
 
         end
 
-        $loggers[ logging_name ] = curr_logger_array
+        loggers[ logging_name ] = curr_logger_array
       end
 
-      $loggers[ logging_name ]
+      loggers[ logging_name ]
 
     end
 

@@ -8,9 +8,9 @@ module Dist
     include Helpers
     include Logged
 
-    def get_config_class
+    def config_class
       # This *SHOULD* get overriden in each child of BaseApp ... warn the user if they missed a step.
-      display_debug_message( 'WARNING: BaseApp#get_config_class used.' )
+      display_debug_message( 'WARNING: BaseApp#config_class used.' )
 
       # return the BaseConfig class.
       BaseConfig
@@ -29,10 +29,10 @@ module Dist
 
     def load_config
 
-      config_class = get_config_class
-      $config = config_class.new( ARGV.pop )
+      config_klass = config_class
+      @config = config_klass.new( ARGV.pop )
 
-      handle_redis_config( $config[ 'redis_host' ], $config[ 'redis_port' ], $config[ 'redis_pass' ] )
+      handle_redis_config( @config[ 'redis_host' ], @config[ 'redis_port' ], @config[ 'redis_pass' ] )
 
     end
 

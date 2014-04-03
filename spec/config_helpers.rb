@@ -10,7 +10,7 @@ module Dist
 
     include Helpers
 
-    def get_base_config_hash
+    def base_config_hash
 
       {
         'name'       => 'config name',
@@ -34,7 +34,7 @@ module Dist
 
         # The 'base' attributes mentioned here come from the attributes that are required by all configuration
         # classes derived from BaseConfig. Most config classes use these.
-        attributes.merge!( get_base_config_hash ) unless additional_params[ :disable_base_attributes ]
+        attributes.merge!( base_config_hash ) unless additional_params[ :disable_base_attributes ]
 
         attributes.merge!( from_hash )
       else

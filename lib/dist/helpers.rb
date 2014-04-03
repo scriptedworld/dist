@@ -29,12 +29,12 @@ module Dist
     include Asserts
 
     # This stores the number of milliseconds in 1 interval of the given length
-    TIME_UNITS = { 'MILLIS' => 1,              # 1 ms is 1 ms
-                   'SECOND' => 1000,           # 1000 ms in 1 sec
-                   'MINUTE' => 60000,          # 60 sec in 1 min
-                   'HOUR'   => 3600000,        # 60 min in 1 hr
-                   'DAY'    => 86400000,       # 24 hr in 1 day
-                   'WEEK'   => 604800000 }     # 7 days in 1 wk
+    TIME_UNITS = { 'MILLIS' => 1,                # 1 ms is 1 ms
+                   'SECOND' => 1_000,            # 1000 ms in 1 sec
+                   'MINUTE' => 60_000,           # 60 sec in 1 min
+                   'HOUR'   => 3_600_000,        # 60 min in 1 hr
+                   'DAY'    => 86_400_000,       # 24 hr in 1 day
+                   'WEEK'   => 604_800_000 }     # 7 days in 1 wk
 
     # Predefined sets of chars for the random-char and random-string functions.
     ALPHA_CHARS        = %w( A B C D E F G H I J K L M N O P Q R S T U V W X Y Z )
@@ -48,13 +48,14 @@ module Dist
     PERCENTILE_NAMES   = PERCENTILE_VALUES.map { |i| "tp#{ i }" }
 
     def handle_redis_config( redis_host, redis_port, redis_pass )
-      $host = redis_host
-      $port = redis_port
-      $pass = redis_pass
+      display_debug_message( "Update redis config: #{ redis_host } #{ redis_port } #{ redis_pass }" )
+      ObjectStore.redis_host = redis_host
+      ObjectStore.redis_port = redis_port
+      ObjectStore.redis_pass = redis_pass
     end
 
     def load_file( file_path )
-      raise "File '#{ file_path }' not found." unless File.exists?( file_path )
+      raise "File '#{ file_path }' not found." unless File.exist?( file_path )
       File.open( file_path ).read
     end
 

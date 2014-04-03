@@ -6,7 +6,7 @@ module Dist
     def assert( condition, message = nil )
       unless condition == true
         usable_message = message || 'Condition not met.'
-        raise AssertionFailure.new( usable_message )
+        raise( AssertionFailure, usable_message )
       end
     end
 

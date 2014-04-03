@@ -7,7 +7,7 @@ module Dist
 
     include Helpers
 
-    REQUIRED_ATTRIBUTES = %w( name log_dir redis_host redis_port redis_pass debug )
+    REQUIRED_ATTRIBUTES = %w( name redis_host redis_port redis_pass debug )
 
     def []( key )
       @attributes[ key ]

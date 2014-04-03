@@ -193,9 +193,9 @@ module Dist
     def kill_process( pid )
       display_debug_message( "Killing Process: #{ pid }" )
       Process.kill( 'TERM', pid )
-    rescue Errno::ESRCH => e
-      # We got a no process error, which is fine in this case.
-      # TODO: Log that it occurred so it doesn't seem suppressed.
+    rescue Errno::ESRCH
+      # We got a no process error, which is fine in this case. Log it to make this visible.
+      display_error_message( 'Errno::ESRCH rescued & ignored by ManageWorkers.' )
     end
 
     def stop_worker

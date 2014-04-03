@@ -9,8 +9,11 @@ module Dist
     # include Helpers
     include Logged
 
+    attr_reader :job_id
+    attr_writer :job_data
+
     def initialize( id = nil )
-      @job_store                 = JobStore.new
+      @job_store                 = JobStore.instance
 
       @phase_stack               = []
       @phase_delimiter           = '.'
@@ -39,12 +42,8 @@ module Dist
       @job_data[ key ] = value
     end
 
-    def set_attributes( replacement_hash )
-      @job_data = replacement_hash
-    end
-
-    def set_item_id( new_id )
-      display_debug_message( "Overwritting existing Item ID for #{ @job_id } to #{ new_id }." ) unless @job_id.nil?
+    def job_id=( new_id )
+      display_debug_message( "Overwritting existing Job ID for #{ @job_id } to #{ new_id }." ) unless @job_id.nil?
       @job_id = new_id
     end
 
@@ -62,7 +61,7 @@ module Dist
 
     # When we go to save a job, we will assign an ID if previously nil.
     def save
-      @job_id = @job_store.get_new_item_id if @job_id.nil?
+      @job_id = @job_store.next_item_id if @job_id.nil?
 
       @job_store.save_item( @job_id, @job_data )
 
@@ -74,7 +73,7 @@ module Dist
     end
 
     def start
-      set_state( 'PROCESSING' )
+      self.state = 'PROCESSING'
     end
 
     def setup
@@ -91,20 +90,20 @@ module Dist
     end
 
     def success
-      set_state( 'COMPLETE' )
+      self.state = 'COMPLETE'
     end
 
     def failure( e = nil )
-      set_state( 'BROKEN' )
+      self.state = 'BROKEN'
     end
 
-    def get_state
-      @job_store.get_item_state( @job_id )
+    def state
+      @job_store.current_item_state( @job_id )
     end
 
     # WARNING: Setting state does not update the JobStore automatically>
-    def set_state( new_state )
-      @job_store.set_item_state( @job_id, new_state )
+    def state=( new_state )
+      @job_store.update_item_state( @job_id, new_state )
     end
 
     def record_exception( e )
@@ -146,9 +145,9 @@ module Dist
         end
 
         record_exception( e )
-        set_state( 'READY' )
-      rescue Exception => e
-        # Unrecoverable error.
+        self.state = 'READY'
+      rescue => e
+        # All exceptions other than JobException are considered unrecoverable.
         do_phase( 'failure_teardown' ) do
           teardown( e )
         end
@@ -189,12 +188,12 @@ module Dist
       end
     end
 
-    def get_phase_tag
+    def phase_tag
       @phase_stack.join( @phase_delimiter )
     end
 
     def track_timestamp( name )
-      complete_name = @timing_stats_prefix + get_phase_tag + @phase_delimiter + name
+      complete_name = @timing_stats_prefix + phase_tag + @phase_delimiter + name
       display_debug_message( "Warning: Overwritting #{ complete_name }" ) if @job_data.key?( complete_name )
       @job_data[ complete_name ] = Time.now.to_f
     end

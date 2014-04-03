@@ -12,17 +12,17 @@ module Dist
     end
 
     def wait_for_job_via_polling
-      wait_seconds( $config[ 'polling_delay_seconds' ], ( $config[ 'polling_timing' ] == 'absolute' ), $config[ 'polling_delay_stdev' ] )
+      wait_seconds( @config[ 'polling_delay_seconds' ], ( @config[ 'polling_timing' ] == 'absolute' ), @config[ 'polling_delay_stdev' ] )
     end
 
-    def get_ready_job
+    def next_ready_job
 
       parts = @j.get_item_id_from_state( 'READY' )
 
       job_id = parts.nil? ? nil : parts[0]
       output = nil
 
-      if ( job_id.is_a?( String ) ) && ( job_id.start_with?( @j.get_item_prefix ) )
+      if ( job_id.is_a?( String ) ) && ( job_id.start_with?( @j.item_prefix ) )
 
         job_attributes = @j.load_item( job_id )
         job_class = job_attributes[ 'job_class' ]
@@ -34,8 +34,8 @@ module Dist
         # it again. Build our Job object instead of letting the constructor
         # duplicate the work done above.
         output = job_klass.new
-        output.set_item_id( job_id )
-        output.set_attributes( job_attributes )
+        output.job_id   = job_id
+        output.job_data = job_attributes
 
       else
 
@@ -48,7 +48,7 @@ module Dist
 
     end
 
-    def get_config_class
+    def config_class
       WorkerConfig
     end
 
@@ -57,20 +57,20 @@ module Dist
       # NOTE: Here we pull a rubyism ... replace watForJob with the correct method
       #       based on configuration. This way, when we're in the middle of handling
       #       jobs, we don't have to check this value each time.
-      case ( $config[ 'queue_method' ] )
+      case ( @config[ 'queue_method' ] )
       when 'signals' then
         alias :waitForJob :wait_for_job_via_signalling
       when 'polling' then
         alias :waitForJob :wait_for_job_via_polling
       end
 
-      @j = JobStore.new
+      @j = JobStore.instance
 
       loop do
 
         begin
 
-          job = get_ready_job
+          job = next_ready_job
           job.handle_lifecycle unless job.nil?
 
         rescue => e
@@ -84,8 +84,9 @@ module Dist
             binding.pry
           end
 
+          # In the event we had an error, we disconnect & reconnect to redis.
           @j.disconnect
-          @j = JobStore.new
+          @j = JobStore.instance
 
           retry
 

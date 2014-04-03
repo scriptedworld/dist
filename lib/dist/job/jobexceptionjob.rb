@@ -6,9 +6,7 @@ module Dist
   class JobExceptionJob < Job
 
     def teardown( e = nil )
-      if e.nil?
-        raise JobException.new( 'BLOW UP a little, but we can recover.' )
-      end
+      raise( JobException, 'BLOW UP a little, but we can recover.' ) if e.nil?
     end
 
     def run

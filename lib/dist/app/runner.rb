@@ -7,9 +7,9 @@ module Dist
   class RunnerApp < BaseApp
 
     def record_run_event( event_name, additional_data = {} )
-      event_store = EventStore.new
+      event_store = EventStore.instance
 
-      new_id = event_store.get_new_item_id
+      new_id = event_store.next_item_id
 
       attributes = {}
       attributes.merge!( additional_data )
@@ -25,10 +25,10 @@ module Dist
       attributes.merge!( base_attributes ) unless base_attributes.nil?
 
       j = Job.new
-      j.set_attributes( attributes )
+      j.job_data = attributes
       j.save
 
-      j.set_state( 'READY' )
+      j.state = 'READY'
       j.signal_ready
     end
 
@@ -41,13 +41,13 @@ module Dist
       1000 / ( TIME_UNITS[ interval_name ] / rate )
     end
 
-    def get_config_class
+    def config_class
       RunnerConfig
     end
 
     def handle_phase( curr_phase )
 
-      record_run_event( "Phase #{ $config[ 'name' ] }::#{ curr_phase[ 'name' ] }: START" )
+      record_run_event( "Phase #{ @config[ 'name' ] }::#{ curr_phase[ 'name' ] }: START" )
 
       display_debug_message( "Starting Phase: #{ curr_phase[ 'name' ] }." )
 
@@ -102,9 +102,9 @@ module Dist
             # TODO: We should check for instance specific attributes to merge in on top of the base_attributes collection.
 
             # Schedule a job.
-            schedule_job( curr_job, $config[ 'base_attributes' ] )
+            schedule_job( curr_job, @config[ 'base_attributes' ] )
 
-            if $config[ 'use_poisson' ]
+            if @config[ 'use_poisson' ]
               curr_delay = calculate_poisson( curr_rate )
               job_delays[ curr_class ] = curr_delay
             end
@@ -134,23 +134,23 @@ module Dist
 
       end
 
-      record_run_event( "Phase #{ $config[ 'name' ] }::#{ curr_phase[ 'name' ] }: STOP" )
+      record_run_event( "Phase #{ @config[ 'name' ] }::#{ curr_phase[ 'name' ] }: STOP" )
 
     end
 
     def instance_run
 
-      record_run_event( "Test #{ $config[ 'name' ] }: START" )
+      record_run_event( "Test #{ @config[ 'name' ] }: START" )
 
       infinite_loop = true
       loop_count = 0
       while infinite_loop
 
-        $config[ 'phases' ].each { |curr_phase| handle_phase( curr_phase ) }
+        @config[ 'phases' ].each { |curr_phase| handle_phase( curr_phase ) }
 
-        # Handle the 'continuous' $config value.
+        # Handle the 'continuous' @config value.
 
-        if $config[ 'continuous' ] == true
+        if @config[ 'continuous' ] == true
           record_run_event( "Phase loop ##{ loop_count } complete. Continuous mode restarting phase cycle." )
           loop_count += 1
         else
@@ -159,7 +159,7 @@ module Dist
 
       end
 
-      record_run_event( "Test #{ $config[ 'name' ] }: STOP" )
+      record_run_event( "Test #{ @config[ 'name' ] }: STOP" )
 
     end
 
