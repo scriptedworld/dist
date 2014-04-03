@@ -42,5 +42,3 @@ task test: :spec
 
 task default: :test
 
-# Last thing, invoke the tags task EVERY time we run this Rakefile.
-# Rake::Task[ 'tags' ].invoke

@@ -17,7 +17,6 @@ module Dist
         'redis_host' => 'localhost',
         'redis_port' => 6379,
         'redis_pass' => 'slenderman',
-        'log_dir'    => './',
         'debug'      => false
       }
 

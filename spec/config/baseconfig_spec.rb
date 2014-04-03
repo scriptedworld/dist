@@ -22,7 +22,6 @@ module Dist
       @all_attributes[ 'redis_host' ] = 'localhost'
       @all_attributes[ 'redis_port' ] = 6379
       @all_attributes[ 'redis_pass' ] = 'slenderman'
-      @all_attributes[ 'log_dir'    ] = './'
       @all_attributes[ 'debug'      ] = false
 
       @all_attributes.merge! junk_attributes
