@@ -7,7 +7,7 @@ module Dist
 
     include Helpers
 
-    def presetDebugStateAndValidateResult( pre_debug_state, expected_debug_state, &block )
+    def preset_debug_state_and_validate_result( pre_debug_state, expected_debug_state, &block )
 
       old_state = $DEBUG
       $DEBUG = pre_debug_state
@@ -22,10 +22,10 @@ module Dist
 
     end
 
-    def testDebugState( before_state, after_state, config_file_path, config_class = BaseConfig )
+    def test_debug_state( before_state, after_state, config_file_path, config_class = BaseConfig )
       expect {
-        presetDebugStateAndValidateResult( before_state, after_state ) do
-          withTempFileFromAttributes( config_attributes ) do |temp_file|
+        preset_debug_state_and_validate_result( before_state, after_state ) do
+          with_temp_file_from_attributes( config_attributes ) do |temp_file|
             config_class.new( temp_file.path )
           end
         end

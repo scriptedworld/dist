@@ -3,7 +3,7 @@ name: Runner
 redis_host: localhost
 redis_port: 6379
 redis_pass: slenderman
-log_dir: ./
+log_dir: ./logs
 debug: false                # Must be true or false
 queue_method: polling       # Allowed values are 'polling' and 'signals' ... Do NOT use 'signals' if you wanting to handle more than about 30 jobs/sec.
 polling_delay_seconds: 1.0

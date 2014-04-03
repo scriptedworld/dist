@@ -8,13 +8,13 @@ module Dist
     def initialize
       super
 
-      setItemReadySignalName( 'signal.event.ready' )
-      setNewItemIDKey( 'new.event.number' )
-      setItemPrefix( 'event.' )
-      setStatePrefix( 'events.' )
+      self.item_ready_signal = 'signal.event.ready'
+      self.item_id_key = 'new.event.number'
+      self.item_prefix = 'event.'
+      self.state_prefix = 'events.'
 
       ### NOTE: There are no states for events. They are simply points in time.
-      # setAllowedStates( )
+      # self.allowed_states = []
     end
 
   end

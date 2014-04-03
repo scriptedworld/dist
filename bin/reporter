@@ -7,4 +7,4 @@ $LOAD_PATH << lib_dir unless $LOAD_PATH.include? lib_dir
 
 require 'dist/app/reporter'
 
-Dist::ReporterApp.new().run()
+Dist::ReporterApp.new.run

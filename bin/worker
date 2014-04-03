@@ -16,4 +16,4 @@ Signal.trap( 'TERM' ) { exit! }
 # Terminated Ordered.
 Signal.trap( 'KILL' ) { exit! }
 
-Dist::WorkerApp.new().run()
+Dist::WorkerApp.new.run

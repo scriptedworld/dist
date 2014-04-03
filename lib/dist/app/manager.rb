@@ -23,10 +23,10 @@ module Dist
       @options[:command]            = nil
       @options[:action]             = nil
 
-      parseCommandLine
+      parse_command_line
     end
 
-    def parseCommandLine
+    def parse_command_line
 
       OptionParser.new do |opts|
 
@@ -34,7 +34,7 @@ module Dist
           @options[:piddir] = value
         end
 
-        opts.on( '--action START|STOP|LIST', "Action to take. Start, Stop, or List Workers." ) do |value|
+        opts.on( '--action START|STOP|LIST', 'Action to take. Start, Stop, or List Workers.' ) do |value|
           @options[:action] = value.upcase
         end
 
@@ -46,7 +46,7 @@ module Dist
           @options[:delay] = value.to_f
         end
 
-        opts.on( '--command COMMAND', "What command to execute?" ) do |value|
+        opts.on( '--command COMMAND', 'What command to execute?' ) do |value|
           @options[:command] = value
         end
 
@@ -60,21 +60,21 @@ module Dist
       assert( %w( START STOP LIST ).include?( @options[:action] ), "Action must either 'START', 'STOP' or 'LIST'." )
 
       # Quantity matters for START & STOP actions.
-      assert( ( @options[:quantity] > 0 ), "Quantity must be greater than 0." ) unless ( @options[:action] == 'LIST' )
+      assert( ( @options[:quantity] > 0 ), 'Quantity must be greater than 0.' ) unless @options[:action] == 'LIST'
 
       # Command only matters for START actions.
-      assert_not_empty( @options[:command], "Command must be provided." ) if ( @options[:action] == 'START' )
+      assert_not_empty( @options[:command], 'Command must be provided.' ) if @options[:action] == 'START'
 
     end
 
-    def forkSubProcess
+    def fork_subprocess
 
       pid = fork
 
-      if( pid.nil? )
+      if pid.nil?
         # We're in the child
 
-        displayDebugMessage( "Exec: #{ @options[:command] }" )
+        display_debug_message( "Exec: #{ @options[:command] }" )
         exec( @options[:command] )
 
         # We shouldn't ever get here ... but we'll put in an exit just in case.
@@ -89,9 +89,9 @@ module Dist
 
     end
 
-    def enumerateWorkers
+    def enumerate_workers
 
-      @known_pids = Array.new
+      @known_pids = []
 
       # Iterate over all files in the @options[:piddir] directory. Each *SHOULD* only contain a process ID.
       Dir.glob( "#{ @options[:piddir] }*.pid" ) do |curr_file|
@@ -102,7 +102,7 @@ module Dist
         begin
           curr_yaml = YAML.load_file( curr_file )
 
-          if( curr_yaml[:desc] == 'PID FILE' )
+          if curr_yaml[:desc] == 'PID FILE'
             curr_pid = curr_yaml[:pid]
             valid_process = true
 
@@ -128,22 +128,22 @@ module Dist
 
     end
 
-    def startWorker
+    def start_worker
 
-      pid = forkSubProcess()
+      pid = fork_subprocess
 
       # After we've started the process, create a PID file based on a YAML representation of things.
       File.open( "#{ @options[:piddir] }#{ pid }.pid", 'w' ) do |file|
         file << { desc: 'PID FILE', pid: pid }.to_yaml
       end
 
-      displayDebugMessage( "Started Worker: #{ pid }" )
+      display_debug_message( "Started Worker: #{ pid }" )
 
     end
 
-    def buildProcessTree
+    def build_process_tree
 
-      proc_tree = Hash.new { |ht,k| ht[k] = Array.new }
+      proc_tree = Hash.new { |ht, k| ht[k] = Array.new }
       proc_list = `ps -eo pid,ppid`.scan( /\d+/ )
 
       # To begin, populate things based on what we know ( only 1 generation )
@@ -159,7 +159,7 @@ module Dist
 
       modifications_made = true
 
-      until( modifications_made == false )
+      until modifications_made == false
 
         modifications_made = false
 
@@ -178,40 +178,41 @@ module Dist
           children_after = proc_tree[ curr_key ].uniq.sort
 
           # Check for modifications.
-          modifications_made = ( modifications_made or ( children_before != children_after ) )
+          modifications_made = ( modifications_made || ( children_before != children_after ) )
           proc_tree[curr_key] = children_after
 
         end
 
       end
 
-      # We should be done.
-      return proc_tree
+      # We should be done. Return what we have.
+      proc_tree
 
     end
 
-    def killProcess( pid )
-      displayDebugMessage( "Killing Process: #{ pid }" )
+    def kill_process( pid )
+      display_debug_message( "Killing Process: #{ pid }" )
       Process.kill( 'TERM', pid )
     rescue Errno::ESRCH
-      # We got a no process error, which is fine in this case.
+      # We got a no process error, which is fine in this case. Log it to make this visible.
+      display_error_message( 'Errno::ESRCH rescued & ignored by ManageWorkers.' )
     end
 
-    def stopWorker
+    def stop_worker
 
-      assert( @known_pids.length > 0, "Not enough processes found to fulfill request." )
+      assert( @known_pids.length > 0, 'Not enough processes found to fulfill request.' )
 
       pid = @known_pids[ rand( @known_pids.length ) ]
 
-      proc_tree = buildProcessTree
+      proc_tree = build_process_tree
 
       # Kill children.
       proc_tree[ pid ].each do |curr_child|
-        killProcess( curr_child )
+        kill_process( curr_child )
       end
 
       # Kill parent.
-      killProcess( pid )
+      kill_process( pid )
 
       # Clean up PID file.
       File.unlink( "#{ @options[:piddir] }#{ pid }.pid" )
@@ -219,26 +220,26 @@ module Dist
 
     def run
 
-      if( @options[:action] == 'START' )
+      if @options[:action] == 'START'
         @options[:quantity].times do
-          startWorker
+          start_worker
           sleep( @options[:delay] )
         end
       end
 
-      if( @options[:action] == 'STOP' )
+      if @options[:action] == 'STOP'
         @options[:quantity].times do
 
-          enumerateWorkers
-          stopWorker
+          enumerate_workers
+          stop_worker
 
         end
       end
 
       # We're done, now show the user what processes we know about.
-      enumerateWorkers
+      enumerate_workers
 
-      puts( "Known Workers:" )
+      puts( 'Known Workers:' )
       puts( @known_pids.to_yaml )
 
     end
@@ -246,4 +247,3 @@ module Dist
   end
 
 end
-

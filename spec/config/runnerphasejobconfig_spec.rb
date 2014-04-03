@@ -3,9 +3,10 @@ require 'dist/config/runnerconfig'
 
 module Dist
 
-  describe "Runner Phase Job Configuration Objects" do
+  describe 'Runner Phase Job Configuration Objects' do
 
     include Helpers
+    include ConfigHelpers
 
     before( :all ) do
 
@@ -18,59 +19,46 @@ module Dist
 
     end
 
-    it "should NOT be derived from BaseConfig" do
+    it 'should NOT be derived from BaseConfig' do
 
       expect( RunnerPhaseJobConfig.new( {} ) ).to_not be_a_kind_of( BaseConfig )
 
     end
 
-    it "should instantiate with any input." do
+    it 'should instantiate with any input.' do
 
       [ true, 1, [], 3.0, Object.new, {}, nil ].each do |curr_test_value|
-        expect {
-          RunnerPhaseJobConfig.new( curr_test_value )
-        }.to_not raise_error()
+        expect { RunnerPhaseJobConfig.new( curr_test_value ) }.to_not raise_error
       end
 
     end
 
-    context 'when .validate() is called' do
+    context 'when .validate is called' do
 
-      it "should ensure nil & non-hash values weren't provided during initialization." do
+      it 'should ensure nil & non-hash values were not provided during initialization.' do
 
         # Nil gets a special message.
-        expect {
-          RunnerPhaseJobConfig.new( nil ).validate()
-        }.to raise_error( "Provided argument is nil." )
+        expect_validate_to_raise_error( RunnerPhaseJobConfig.new( nil ), 'Provided argument is nil.' )
 
         # Everything else gets a this-isnt-a-hash message.
         [ 1, [], 3.0, Object.new ].each do |curr_test_value|
-          expect {
-            RunnerPhaseJobConfig.new( curr_test_value ).validate()
-          }.to raise_error( "Provided argument is not a hash." )
+          expect_validate_to_raise_error( RunnerPhaseJobConfig.new( curr_test_value ), 'Provided argument is not a hash.' )
         end
 
       end
 
-      it "should ensure the required values are all provided" do
+      it 'should ensure the required values are all provided' do
 
-        expect {
-          RunnerPhaseJobConfig.new( @all_attributes ).validate()
-        }.to_not raise_error()
-
+        expect { RunnerPhaseJobConfig.new( @all_attributes ).validate }.to_not raise_error
 
         @all_attributes.keys.each do |curr_key|
           curr_attrs = @all_attributes.dup
           curr_attrs.delete( curr_key )
 
-          expect {
-            RunnerPhaseJobConfig.new( curr_attrs ).validate()
-          }.to raise_error( "Key #{ curr_key } missing." )
+          expect_validate_to_raise_error( RunnerPhaseJobConfig.new( curr_attrs ), "Key #{ curr_key } missing." )
         end
 
-        expect {
-          RunnerPhaseJobConfig.new( @empty ).validate()
-        }.to raise_error( 'Key job_class missing.' )
+        expect_validate_to_raise_error( RunnerPhaseJobConfig.new( @empty ), 'Key job_class missing.' )
 
       end
 

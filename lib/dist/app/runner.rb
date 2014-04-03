@@ -6,50 +6,50 @@ module Dist
 
   class RunnerApp < BaseApp
 
-    def recordRunEvent( event_name, additional_data = {} )
-      event_store = EventStore.new
+    def record_run_event( event_name, additional_data = {} )
+      event_store = EventStore.instance
 
-      new_id = event_store.getNewItemID()
+      new_id = event_store.next_item_id
 
-      attributes = Hash.new
+      attributes = {}
       attributes.merge!( additional_data )
       attributes[ 'name' ] = event_name
       attributes[ 'timestamp' ] = Time.now.to_f
 
-      event_store.saveItem( new_id, attributes )
+      event_store.save_item( new_id, attributes )
     end
 
-    def scheduleJob( job_info, base_attributes = {} )
-      attributes = Hash.new
+    def schedule_job( job_info, base_attributes = {} )
+      attributes = {}
       attributes[ 'job_class' ] = job_info[ 'job_class' ]
       attributes.merge!( base_attributes ) unless base_attributes.nil?
 
       j = Job.new
-      j.setAttributes( attributes )
-      j.save()
+      j.job_data = attributes
+      j.save
 
-      j.setState( 'READY' )
-      j.signalReady()
+      j.state = 'READY'
+      j.signal_ready
     end
 
-    def calculatePoisson( ratePerSecond )
+    def calculate_poisson( desired_rate_per_second )
       # Wait duration in Milliseconds
-      ( -( Math.log( 1 - Kernel.rand ) ) / ratePerSecond ) * 1000
+      ( -( Math.log( 1 - Kernel.rand ) ) / desired_rate_per_second ) * 1000
     end
 
-    def ratePerSecond( rate, interval_name )
+    def rate_per_second( rate, interval_name )
       1000 / ( TIME_UNITS[ interval_name ] / rate )
     end
 
-    def getConfigClass
+    def config_class
       RunnerConfig
     end
 
-    def handlePhase( curr_phase )
+    def handle_phase( curr_phase )
 
-      recordRunEvent( "Phase #{ $config[ 'name' ] }::#{ curr_phase[ 'name' ] }: START" )
+      record_run_event( "Phase #{ @config[ 'name' ] }::#{ curr_phase[ 'name' ] }: START" )
 
-      displayDebugMessage( "Starting Phase: #{ curr_phase[ 'name' ] }." )
+      display_debug_message( "Starting Phase: #{ curr_phase[ 'name' ] }." )
 
       phase_job_count = 0
       phase_time_elapsed = 0
@@ -64,17 +64,17 @@ module Dist
       # setup for the first run of each job type
       curr_phase[ 'jobs' ].each do |curr_job|
         curr_job_class = curr_job[ 'job_class' ]
-        job_rates[ curr_job_class ] = ratePerSecond( curr_job[ 'per_unit' ], curr_job[ 'unit' ] )
+        job_rates[ curr_job_class ] = rate_per_second( curr_job[ 'per_unit' ], curr_job[ 'unit' ] )
         job_delays[ curr_job_class ] = 1000 / job_rates[ curr_job_class ]
         job_elapsed[ curr_job_class ] = 0
       end
 
-      displayDebugMessage( "Max Count: #{ phase_max_job_count }" )
-      displayDebugMessage( "Max Duration: #{ phase_max_time_elapsed }" )
+      display_debug_message( "Max Count: #{ phase_max_job_count }" )
+      display_debug_message( "Max Duration: #{ phase_max_time_elapsed }" )
 
       stop = false
 
-      until( stop ) do
+      until stop
 
         current_time = Time.now.to_f
         last_time ||= current_time
@@ -82,7 +82,7 @@ module Dist
         elapsed = ( current_time - last_time ) * 1000
 
         # Wait until at least a millisecond has passed.
-        next unless( elapsed > 1.0 )
+        next unless elapsed > 1.0
 
         last_time = current_time
 
@@ -96,16 +96,16 @@ module Dist
 
           curr_elapsed += elapsed
 
-          if( curr_elapsed >= curr_delay )
+          if curr_elapsed >= curr_delay
             curr_elapsed -= curr_delay
 
             # TODO: We should check for instance specific attributes to merge in on top of the base_attributes collection.
 
             # Schedule a job.
-            scheduleJob( curr_job, $config[ 'base_attributes' ] )
+            schedule_job( curr_job, @config[ 'base_attributes' ] )
 
-            if( $config[ 'use_poisson' ] )
-              curr_delay = calculatePoisson( curr_rate )
+            if @config[ 'use_poisson' ]
+              curr_delay = calculate_poisson( curr_rate )
               job_delays[ curr_class ] = curr_delay
             end
 
@@ -113,19 +113,19 @@ module Dist
             # having had enough time elapsed for this phase.
             phase_job_count += 1
 
-            displayDebugMessage( "#{ curr_class }: Next delay #{ curr_delay }ms" )
+            display_debug_message( "#{ curr_class }: Next delay #{ curr_delay }ms" )
           end
 
           job_elapsed[ curr_class ] = curr_elapsed
 
           # If I'm tracking job count for the phase ...
-          unless( phase_max_job_count == -1 )
+          unless phase_max_job_count == -1
             stop = phase_job_count >= phase_max_job_count
             next
           end
 
           # If I'm tracking time elapsed for the phase ...
-          unless( phase_max_time_elapsed == -1 )
+          unless phase_max_time_elapsed == -1
             stop = phase_time_elapsed >= phase_max_time_elapsed
             next
           end
@@ -134,26 +134,24 @@ module Dist
 
       end
 
-      recordRunEvent( "Phase #{ $config[ 'name' ] }::#{ curr_phase[ 'name' ] }: STOP" )
+      record_run_event( "Phase #{ @config[ 'name' ] }::#{ curr_phase[ 'name' ] }: STOP" )
 
     end
 
     def instance_run
 
-      last_time = Time.now.to_f
-
-      recordRunEvent( "Test #{ $config[ 'name' ] }: START" )
+      record_run_event( "Test #{ @config[ 'name' ] }: START" )
 
       infinite_loop = true
-      loop_count = 0;
-      while( infinite_loop ) do
+      loop_count = 0
+      while infinite_loop
 
-        $config[ 'phases' ].each { |curr_phase| handlePhase( curr_phase ) }
+        @config[ 'phases' ].each { |curr_phase| handle_phase( curr_phase ) }
 
-        # Handle the 'continuous' $config value.
+        # Handle the 'continuous' @config value.
 
-        if( $config[ 'continuous' ] == true )
-          recordRunEvent( "Phase loop ##{ loop_count } complete. Continuous mode restarting phase cycle." )
+        if @config[ 'continuous' ] == true
+          record_run_event( "Phase loop ##{ loop_count } complete. Continuous mode restarting phase cycle." )
           loop_count += 1
         else
           infinite_loop = false
@@ -161,7 +159,7 @@ module Dist
 
       end
 
-      recordRunEvent( "Test #{ $config[ 'name' ] }: STOP" )
+      record_run_event( "Test #{ @config[ 'name' ] }: STOP" )
 
     end
 

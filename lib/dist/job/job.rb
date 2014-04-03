@@ -9,10 +9,13 @@ module Dist
     # include Helpers
     include Logged
 
-    def initialize( id = nil )
-      @job_store                 = JobStore.new
+    attr_reader :job_id
+    attr_writer :job_data
 
-      @phase_stack               = Array.new
+    def initialize( id = nil )
+      @job_store                 = JobStore.instance
+
+      @phase_stack               = []
       @phase_delimiter           = '.'
 
       @timing_stats_prefix       = 'stats.timing.'
@@ -24,7 +27,7 @@ module Dist
 
       # If id was nil, one will be assigned when the job is saved.
       @job_id                    = id
-      @job_data                  = Hash.new
+      @job_data                  = {}
       @job_state                 = 'INITIAL'
 
       load
@@ -39,43 +42,38 @@ module Dist
       @job_data[ key ] = value
     end
 
-    def setAttributes( replacement_hash )
-      @job_data = replacement_hash
-    end
-
-    def setItemID( new_id )
-      displayDebugMessage( "Overwritting existing Item ID for #{ @job_id } to #{ new_id }." ) unless @job_id.nil?
+    def job_id=( new_id )
+      display_debug_message( "Overwritting existing Job ID for #{ @job_id } to #{ new_id }." ) unless @job_id.nil?
       @job_id = new_id
     end
 
     def load
-      unless( @job_id.nil? )
-        @job_data = @job_store.loadItem( @job_id )
+      unless @job_id.nil?
+        @job_data = @job_store.load_item( @job_id )
 
         # Add holders for failure information if they don't exist.
-        @job_data[@failure_error_message_key] ||= Array.new
-        @job_data[@failure_error_trace_key] ||= Array.new
+        @job_data[ @failure_error_message_key ] ||= []
+        @job_data[ @failure_error_trace_key   ] ||= []
       end
 
-      displayDebugMessage( { id: @job_id, attributes: @job_data } ) unless @job_id.nil?
+      display_debug_message( id: @job_id, attributes: @job_data ) unless @job_id.nil?
     end
 
     # When we go to save a job, we will assign an ID if previously nil.
     def save
-      if( @job_id.nil? )
-        @job_id = @job_store.getNewItemID()
-      end
-      @job_store.saveItem( @job_id, @job_data )
+      @job_id = @job_store.next_item_id if @job_id.nil?
 
-      displayDebugMessage( { id: @job_id, attributes: @job_data } )
+      @job_store.save_item( @job_id, @job_data )
+
+      display_debug_message( id: @job_id, attributes: @job_data )
     end
 
-    def signalReady
-      @job_store.publishItemReadySignal()
+    def signal_ready
+      @job_store.publish_item_ready_signal
     end
 
     def start
-      setState( 'PROCESSING' )
+      self.state = 'PROCESSING'
     end
 
     def setup
@@ -84,7 +82,7 @@ module Dist
 
     def run
       # to be overridden by derivative class.
-      raise "Job::run must be overridden."
+      raise 'Job::run must be overridden.'
     end
 
     def teardown( e = nil )
@@ -92,111 +90,111 @@ module Dist
     end
 
     def success
-      setState( 'COMPLETE' )
+      self.state = 'COMPLETE'
     end
 
     def failure( e = nil )
-      setState( 'BROKEN' )
+      self.state = 'BROKEN'
     end
 
-    def getState
-      @job_store.getItemState( @job_id )
+    def state
+      @job_store.current_item_state( @job_id )
     end
 
     # WARNING: Setting state does not update the JobStore automatically>
-    def setState( new_state )
-      @job_store.setItemState( @job_id, new_state )
+    def state=( new_state )
+      @job_store.update_item_state( @job_id, new_state )
     end
 
-    def recordException( e )
-      @job_data[ @failure_error_message_key ] = Array.new unless @job_data.key?( @failure_error_message_key )
-      @job_data[ @failure_error_trace_key ] = Array.new unless @job_data.key?( @failure_error_trace_key )
+    def record_exception( e )
+      @job_data[ @failure_error_message_key ] = [] unless @job_data.key?( @failure_error_message_key )
+      @job_data[ @failure_error_trace_key   ] = [] unless @job_data.key?( @failure_error_trace_key )
       @job_data[ @failure_error_message_key ] << e.message
-      @job_data[ @failure_error_trace_key ] << e.backtrace
+      @job_data[ @failure_error_trace_key   ] << e.backtrace
     end
 
-    def handleLifecycle
-      startPhase( 'lifecycle' )
+    def handle_lifecycle
+      start_phase( 'lifecycle' )
 
       begin
 
-        doPhase( 'start' ) do
-          start()
+        do_phase( 'start' ) do
+          start
         end
 
-        doPhase( 'setup' ) do
-          setup()
+        do_phase( 'setup' ) do
+          setup
         end
 
-        doPhase( 'run' ) do
-          run()
+        do_phase( 'run' ) do
+          run
         end
 
-        doPhase( 'teardown' ) do
-          teardown()
+        do_phase( 'teardown' ) do
+          teardown
         end
 
-        doPhase( 'success' ) do
-          success()
+        do_phase( 'success' ) do
+          success
         end
 
       rescue JobException => e
         # Recoverable error.
-        doPhase( 'failure_teardown' ) do
+        do_phase( 'failure_teardown' ) do
           teardown( e )
         end
 
-        recordException( e )
-        setState( 'READY' )
-      rescue Exception => e
-        # Unrecoverable error.
-        doPhase( 'failure_teardown' ) do
+        record_exception( e )
+        self.state = 'READY'
+      rescue => e
+        # All exceptions other than JobException are considered unrecoverable.
+        do_phase( 'failure_teardown' ) do
           teardown( e )
         end
 
-        recordException( e )
+        record_exception( e )
 
-        doPhase( 'failure' ) do
+        do_phase( 'failure' ) do
           failure( e )
         end
 
       ensure
-        endPhase( 'lifecycle' )
+        end_phase( 'lifecycle' )
 
-        save()
+        save
       end
 
     end
 
-    def doPhase( phase_name, &block )
-      startPhase( phase_name )
+    def do_phase( phase_name, &block )
+      start_phase( phase_name )
       yield
-      endPhase( phase_name )
+      end_phase( phase_name )
     end
 
-    def startPhase( phase_name )
+    def start_phase( phase_name )
       @phase_stack << phase_name
-      trackTimestamp( @timing_stats_start_suffix )
+      track_timestamp( @timing_stats_start_suffix )
     end
 
-    def endPhase( phase_name )
-      raise "Phase #{ phase_name } not found." unless( @phase_stack.include?( phase_name ) )
+    def end_phase( phase_name )
+      raise "Phase #{ phase_name } not found." unless @phase_stack.include?( phase_name )
 
       found = false
-      while( found == false ) do
-        trackTimestamp( @timing_stats_end_suffix )
+      while found == false
+        track_timestamp( @timing_stats_end_suffix )
         curr = @phase_stack.pop
         found = ( curr == phase_name )
       end
     end
 
-    def getPhaseTag
+    def phase_tag
       @phase_stack.join( @phase_delimiter )
     end
 
-    def trackTimestamp( name )
-      complete_name = @timing_stats_prefix + getPhaseTag + @phase_delimiter + name
-      displayDebugMessage( "Warning: Overwritting #{ complete_name }" ) if @job_data.key?( complete_name )
+    def track_timestamp( name )
+      complete_name = @timing_stats_prefix + phase_tag + @phase_delimiter + name
+      display_debug_message( "Warning: Overwritting #{ complete_name }" ) if @job_data.key?( complete_name )
       @job_data[ complete_name ] = Time.now.to_f
     end
 

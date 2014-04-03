@@ -4,38 +4,38 @@ module Dist
   module Asserts
 
     def assert( condition, message = nil )
-      unless( condition == true )
-        usable_message = message || "Condition not met."
-        raise AssertionFailure.new( usable_message )
+      unless condition == true
+        usable_message = message || 'Condition not met.'
+        raise( AssertionFailure, usable_message )
       end
     end
 
     def assert_false( condition, message = nil )
-      usable_message = message || "Condition is not false."
+      usable_message = message || 'Condition is not false.'
       assert( ( condition == false ), usable_message )
     end
 
     def assert_nil( obj, message = nil )
-      usable_message = message || "Object is not nil."
+      usable_message = message || 'Object is not nil.'
       assert( obj.nil?, usable_message )
     end
 
     def assert_not_nil( obj, message = nil )
-      usable_message = message || "Object is nil."
+      usable_message = message || 'Object is nil.'
       assert( obj.nil? == false, usable_message )
     end
 
     def assert_empty( collection, message = nil )
       assert_not_nil( collection )
 
-      usable_message = message || "Collection is not empty."
+      usable_message = message || 'Collection is not empty.'
       assert( collection.empty?, usable_message )
     end
 
     def assert_not_empty( collection, message = nil )
       assert_not_nil( collection )
 
-      usable_message = message || "Collection is empty."
+      usable_message = message || 'Collection is empty.'
       assert( collection.empty? == false, usable_message )
     end
 

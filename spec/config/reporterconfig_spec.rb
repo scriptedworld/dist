@@ -3,7 +3,7 @@ require 'dist/config/reporterconfig'
 
 module Dist
 
-  describe "Reporter Configuration Files" do
+  describe 'Reporter Configuration Files' do
 
     include Helpers
     include ConfigHelpers
@@ -19,16 +19,16 @@ module Dist
 
     end
 
-    it "should be derived from BaseConfig" do
-      kindOfBaseConfig( @attribute_hashes[ :all ], ReporterConfig, :include_base_attributes => true )
+    it 'should be derived from BaseConfig' do
+      kind_of_baseconfig( @attribute_hashes[ :all ], ReporterConfig )
     end
 
-    it "requires a report_interval_seconds parameter" do
-      expectNewConfigToRaiseError( @attribute_hashes[ :empty ], ReporterConfig, "Key report_interval_seconds missing.", :include_base_attributes => true )
+    it 'requires a report_interval_seconds parameter' do
+      expect_new_config_to_raise_error( @attribute_hashes[ :empty ], ReporterConfig, 'Key report_interval_seconds missing.' )
     end
 
-    it "requires the report_interval_seconds parameter to be a float compatible value." do
-      expectNewConfigToRaiseError( { 'report_interval_seconds' => 'foo' }, ReporterConfig, "invalid value for Float(): \"foo\"", :include_base_attributes => true )
+    it 'requires the report_interval_seconds parameter to be a float compatible value.' do
+      expect_new_config_to_raise_error( { 'report_interval_seconds' => 'foo' }, ReporterConfig, 'invalid value for Float(): "foo"' )
     end
 
   end
