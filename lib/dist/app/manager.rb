@@ -5,10 +5,14 @@ require 'optparse'
 require 'yaml'
 
 require 'dist/helpers'
+require 'dist/logged'
 
 module Dist
 
   class ManageWorkers
+
+    include Helpers
+    include Logged
 
     def initialize
 
@@ -147,7 +151,7 @@ module Dist
 
     end
 
-    def build_process_tree
+    def run_ps_command
 
       proc_tree = Hash.new { |ht, k| ht[k] = Array.new }
       proc_list = `ps -eo pid,ppid`.scan( /\d+/ )
@@ -160,6 +164,14 @@ module Dist
         proc_tree[ parent_pid ] << child_pid
         proc_tree[ child_pid ] = []
       end
+
+      proc_tree
+
+    end
+
+    def build_process_tree
+
+      proc_tree = run_ps_command
 
       # Now we must loop until we have no more generations to account for.
 
