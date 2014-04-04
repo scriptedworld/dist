@@ -49,8 +49,3 @@ task quality: [ :flog, :flay, :rubocop ]
 task test: :spec
 
 task default: :test
-
-`rm -rf .rdoc docs`
-`rdoc --include=./lib --output=docs`
-`rdoc --format=tags --tag-style=vim`
-

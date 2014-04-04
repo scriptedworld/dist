@@ -1,5 +1,6 @@
 
 require 'dist/helpers'
+require 'dist/logged'
 
 module Dist
 

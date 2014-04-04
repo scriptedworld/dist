@@ -100,8 +100,8 @@ module Dist
     # Internal function used by get_normalized_random_number
     def rnd_snd
       ( ( ( Kernel.rand * 2.0 ) - 1.0 ) +
-        ( ( Kernel.rand * 2.0 ) - 1.0 ) +
-        ( ( Kernel.rand * 2.0 ) - 1.0 ) )
+       ( ( Kernel.rand * 2.0 ) - 1.0 ) +
+       ( ( Kernel.rand * 2.0 ) - 1.0 ) )
     end
 
     def get_normalized_random_number( mean, stdev )
@@ -219,6 +219,19 @@ module Dist
       # return calculated stats.
       field_stats
 
+    end
+
+    def record_run_event( event_name, additional_data = {} )
+      event_store = EventStore.instance
+
+      new_id = event_store.next_item_id
+
+      attributes = {}
+      attributes.merge!( additional_data )
+      attributes[ 'name' ] = event_name
+      attributes[ 'timestamp' ] = Time.now.to_f
+
+      event_store.save_item( new_id, attributes )
     end
 
   end

@@ -34,10 +34,7 @@ module Dist
       @attributes = attributes
     end
 
-    def validate
-
-      validate_keys_exist( @attributes, *( %w( name description jobs ) ) )
-
+    def validate_and_format_count_and_duration
       total_count_exists = false
       phase_duration_exists = false
 
@@ -58,6 +55,13 @@ module Dist
 
       # Both are allowed to exist, in which case which ever criteria is met first will terminate the phase.
       raise 'Either total_count or phase_duration must be provided for each phase definition.' unless total_count_exists || phase_duration_exists
+    end
+
+    def validate
+
+      validate_keys_exist( @attributes, *( %w( name description jobs ) ) )
+
+      validate_and_format_count_and_duration
 
       raise 'Jobs array incorrectly defined.' unless @attributes[ 'jobs' ].is_a?( Array )
       @attributes[ 'jobs' ].each { |j| RunnerPhaseJobConfig.new( j ).validate }

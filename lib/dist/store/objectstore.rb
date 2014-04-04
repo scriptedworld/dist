@@ -163,8 +163,8 @@ module Dist
         redis_instance.sadd( new_state, item_id )
       else
         # Existing state.
-        display_debug_message( "Moving item #{ item_id } to #{ new_state } from #{ curr_state.nil? ? 'nil' : curr_state }." )
-        redis_instance.smove( curr_state, new_state, item_id ) unless curr_state.nil?
+        display_debug_message( "Moving item #{ item_id } to #{ new_state } from #{ curr_state }." )
+        redis_instance.smove( curr_state, new_state, item_id )
       end
 
     end
