@@ -29,6 +29,18 @@ module Dist
       display_message( :debug, msg )
     end
 
+    def gen_formatter_proc( inspect_attributes )
+      basic_formatter = Logger::Formatter.new
+
+      Proc.new do |severity, datetime, progname, msg|
+        basic_formatter.call( severity,
+                              datetime,
+                              progname,
+                              msg.ai( inspect_attributes ) )
+
+      end
+    end
+
     def logger_collection
 
       loggers = Logged.loggers
@@ -36,20 +48,12 @@ module Dist
       unless loggers.include?( logging_name )
         curr_logger_array = []
 
-        basic_formatter = Logger::Formatter.new
-
         std_logger = Logger.new( STDOUT )
-
-        std_logger.formatter = proc do |severity, datetime, progname, msg|
-          basic_formatter.call( severity,
-                                datetime,
-                                progname,
-                                msg.ai( plain:     false,
-                                        index:     true,
-                                        multiline: true,
-                                        indent:    2,
-                                        sort_keys: true ) )
-        end
+        std_logger.formatter = gen_formatter_proc( plain: false,
+                                                   index: true,
+                                                   multiline: true,
+                                                   indent: 2,
+                                                   sort_keys: true )
 
         curr_logger_array << std_logger
 
@@ -62,17 +66,12 @@ module Dist
           #        multiple scripts using things like Job or JobStore don't
           #        mangle each others log files.
           log_file = File.new( File.join( log_dir_path, "#{ logging_name }.log" ), 'w+' )
-          file_logger = Logger.new( log_file )
 
-          file_logger.formatter = proc do |severity, datetime, progname, msg|
-            basic_formatter.call( severity,
-                                  datetime,
-                                  progname,
-                                  msg.ai( plain:     true,
-                                          index:     false,
-                                          multiline: false,
-                                          sort_keys: true ) )
-          end
+          file_logger = Logger.new( log_file )
+          file_logger.formatter = gen_formatter_proc( plain: true,
+                                                      index: false,
+                                                      multiline: false,
+                                                      sort_keys: true )
 
           curr_logger_array << file_logger
 
