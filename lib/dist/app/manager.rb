@@ -26,7 +26,7 @@ module Dist
       parse_command_line
     end
 
-    def parse_command_line
+    def handle_option_parser
 
       OptionParser.new do |opts|
 
@@ -51,6 +51,12 @@ module Dist
         end
 
       end.parse!
+
+    end
+
+    def parse_command_line
+
+      handle_option_parser
 
       # Ensure our directories exist.
       FileUtils.mkdir_p( @options[:piddir] ) unless File.exist?( @options[:piddir] )
