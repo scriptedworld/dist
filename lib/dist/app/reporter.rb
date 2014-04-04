@@ -15,6 +15,11 @@ module Dist
       @pass  = nil
       @redis = nil
       @stats = {}
+
+      @timing_stat_prefix       = 'stats.timing.lifecycle.'
+      @timing_stat_suffix_begin = '.begin'
+      @timing_stat_suffix_end   = '.end'
+
     end
 
     def configure_redis( host, port, pass )
@@ -66,25 +71,33 @@ module Dist
 
     end
 
-    def get_elapsed_times_for_job( job_data )
-
-      timing_stat_prefix = 'stats.timing.lifecycle.'
-      timing_stat_suffix_begin = '.begin'
-      timing_stat_suffix_end   = '.end'
+    def each_timing_key( job_data, &block )
 
       elapsed_times = {}
 
       job_keys = job_data.keys
-      timing_keys = job_keys.select { |key| key.start_with?( timing_stat_prefix ) }
+      timing_keys = job_keys.select { |key| key.start_with?( @timing_stat_prefix ) }
 
-      timing_keys.each do |curr_stat_name|
+      timing_keys.each do |curr_stat_name| 
 
-        next unless curr_stat_name.end_with?( timing_stat_suffix_begin )
+        next unless curr_stat_name.end_with?( @timing_stat_suffix_begin )
 
-        phase_name = curr_stat_name[ timing_stat_prefix.length .. -( timing_stat_suffix_begin.length + 1 ) ]
+        yield curr_stat_name
+
+      end
+
+    end
+
+    def get_elapsed_times_for_job( job_data )
+
+      elapsed_times = {}
+
+      each_timing_key( job_data ) do |curr_stat_name|
+
+        phase_name = curr_stat_name[ @timing_stat_prefix.length .. -( @timing_stat_suffix_begin.length + 1 ) ]
 
         phase_start_time = job_data[ curr_stat_name ]
-        phase_end_time   = job_data[ curr_stat_name[ 0 .. -( timing_stat_suffix_begin.length + 1 ) ] + timing_stat_suffix_end ]
+        phase_end_time   = job_data[ curr_stat_name[ 0 .. -( @timing_stat_suffix_begin.length + 1 ) ] + @timing_stat_suffix_end ]
         phase_elapsed    = phase_end_time - phase_start_time
 
         phase_name = 'lifecycle' if phase_name == ''
