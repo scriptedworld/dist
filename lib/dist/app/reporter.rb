@@ -79,19 +79,17 @@ module Dist
 
       timing_keys.each do |curr_stat_name|
 
-        if curr_stat_name.end_with?( timing_stat_suffix_begin )
+        next unless curr_stat_name.end_with?( timing_stat_suffix_begin )
 
-          phase_name = curr_stat_name[ timing_stat_prefix.length .. -( timing_stat_suffix_begin.length + 1 ) ]
+        phase_name = curr_stat_name[ timing_stat_prefix.length .. -( timing_stat_suffix_begin.length + 1 ) ]
 
-          phase_start_time = job_data[ curr_stat_name ]
-          phase_end_time   = job_data[ curr_stat_name[ 0 .. -( timing_stat_suffix_begin.length + 1 ) ] + timing_stat_suffix_end ]
-          phase_elapsed    = phase_end_time - phase_start_time
+        phase_start_time = job_data[ curr_stat_name ]
+        phase_end_time   = job_data[ curr_stat_name[ 0 .. -( timing_stat_suffix_begin.length + 1 ) ] + timing_stat_suffix_end ]
+        phase_elapsed    = phase_end_time - phase_start_time
 
-          phase_name = 'lifecycle' if phase_name == ''
+        phase_name = 'lifecycle' if phase_name == ''
 
-          elapsed_times[ phase_name ] = phase_elapsed
-
-        end
+        elapsed_times[ phase_name ] = phase_elapsed
 
       end
 
