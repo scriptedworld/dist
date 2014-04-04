@@ -74,9 +74,13 @@ module Dist
 
       elapsed_times = {}
 
-      job_data.keys.grep( /^#{ timing_stat_prefix }/ ).each do |curr_stat_name|
+      job_keys = job_data.keys
+      timing_keys = job_keys.select { |key| key.start_with?( timing_stat_prefix ) }
+
+      timing_keys.each do |curr_stat_name|
 
         if curr_stat_name.end_with?( timing_stat_suffix_begin )
+
           phase_name = curr_stat_name[ timing_stat_prefix.length .. -( timing_stat_suffix_begin.length + 1 ) ]
 
           phase_start_time = job_data[ curr_stat_name ]
@@ -86,6 +90,7 @@ module Dist
           phase_name = 'lifecycle' if phase_name == ''
 
           elapsed_times[ phase_name ] = phase_elapsed
+
         end
 
       end
