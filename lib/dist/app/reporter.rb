@@ -73,12 +73,10 @@ module Dist
 
     def each_timing_key( job_data, &block )
 
-      elapsed_times = {}
-
       job_keys = job_data.keys
       timing_keys = job_keys.select { |key| key.start_with?( @timing_stat_prefix ) }
 
-      timing_keys.each do |curr_stat_name| 
+      timing_keys.each do |curr_stat_name|
 
         next unless curr_stat_name.end_with?( @timing_stat_suffix_begin )
 

@@ -32,7 +32,7 @@ module Dist
     def gen_formatter_proc( inspect_attributes )
       basic_formatter = Logger::Formatter.new
 
-      Proc.new do |severity, datetime, progname, msg|
+      proc do |severity, datetime, progname, msg|
         basic_formatter.call( severity,
                               datetime,
                               progname,

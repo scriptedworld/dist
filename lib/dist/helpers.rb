@@ -1,4 +1,3 @@
-
 require 'logger'
 require 'net/http'
 

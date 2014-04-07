@@ -146,7 +146,7 @@ module Dist
 
     describe 'should handle queue_method == "signals"' do
 
-      it  'should not default any polling values' do
+      it 'should not default any polling values' do
 
         with_config( @attribute_hashes[ :all_signals ], WorkerConfig ) do |conf|
           expect( conf[ 'polling_timing' ] ).to be_nil
