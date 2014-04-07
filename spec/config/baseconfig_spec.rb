@@ -42,7 +42,7 @@ module Dist
       @attribute_hashes[ :debug_true ] = debug_true
 
       debug_false = @all_attributes.dup
-      debug_false[ 'debug' ] = true
+      debug_false[ 'debug' ] = false
       @attribute_hashes[ :debug_false ] = debug_false
 
     end
@@ -75,15 +75,12 @@ module Dist
 
     end
 
-    it 'affects $DEBUG when provided & true.' do
+    it 'affects $DEBUG when true.' do
       test_debug_state( true, true, @attribute_hashes[ :debug_true ] )
-      test_debug_state( false, true, @attribute_hashes[ :debug_false ] )
+      test_debug_state( false, true, @attribute_hashes[ :debug_true ] )
     end
 
-    it 'does not affect $DEBUG when not provided or false.' do
-      # Calls with debug not provided by config.
-      test_debug_state( true, true, @attribute_hashes[ :all ] )
-      test_debug_state( false, false, @attribute_hashes[ :all ] )
+    it 'does not affect $DEBUG when false.' do
       # Calls with debug provided and == false
       test_debug_state( true, true, @attribute_hashes[ :debug_false ] )
       test_debug_state( false, false, @attribute_hashes[ :debug_false ] )

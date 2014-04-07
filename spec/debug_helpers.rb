@@ -22,7 +22,7 @@ module Dist
 
     end
 
-    def test_debug_state( before_state, after_state, config_file_path, config_class = BaseConfig )
+    def test_debug_state( before_state, after_state, config_attributes, config_class = BaseConfig )
       expect(
         preset_debug_state_and_validate_result( before_state, after_state ) do
           with_temp_file_from_attributes( config_attributes ) do |temp_file|
