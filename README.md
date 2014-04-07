@@ -101,6 +101,8 @@ You *should* configure your system to have a high quantity of file descriptors a
 
   Each of the runnable applications has it's own configuration file definition.
 
+  Examples can be found in GitHub at: https://github.com/a1ph4g33k/dist/tree/master/data
+
 ## Common configuration items:
 
   * `name`: The name of the configuration file. Optionally, you can also add a 'description' value. The name will be logged during the script runtime, but generally exists
