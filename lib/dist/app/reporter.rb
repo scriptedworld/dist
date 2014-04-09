@@ -249,7 +249,7 @@ module Dist
         work_completed_time = Time.now.to_f - start_time
         sleep_time = @config[ 'report_interval_seconds' ] - work_completed_time
 
-        # WHEN report_interval_seconds isn't enough time to process all of the 
+        # WHEN report_interval_seconds isn't enough time to process all of the
         # completed jobs ... we end up with a negative sleep_time value.
         #
         # As such, when this occurs, only sleep when sleep_time is a positive value.
