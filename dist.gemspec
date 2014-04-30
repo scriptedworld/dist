@@ -15,10 +15,10 @@ Gem::Specification.new do |s|
   s.require_path = 'lib'
 
   s.bindir       = 'bin'
-  s.executables << 'manager'
-  s.executables << 'reporter'
-  s.executables << 'runner'
-  s.executables << 'worker'
+  s.executables << 'dist-manager'
+  s.executables << 'dist-reporter'
+  s.executables << 'dist-runner'
+  s.executables << 'dist-worker'
 
   s.files        = FileList[ 'lib/**/*.rb',
                              'bin/*',
