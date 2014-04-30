@@ -40,40 +40,40 @@ You *should* configure your system to have a high quantity of file descriptors a
 
 # Description of each script:
 
-## Runner:
+## dist-runner:
 
   Responsible for injecting jobs into job queue for workers to process.
 
   Normally runs on the aggr host.
 
-  Runner is invoked providing a runner configuration file ( yaml-based ) as it's only command-line argument.
+  The runner is invoked providing a runner configuration file ( yaml-based ) as it's only command-line argument.
 
-  The Runner Configuration sets up a number of general configuration values and then defines the phases of your test.
+  The runner configuration sets up a number of general configuration values and then defines the phases of your test.
 
   Each phase of the test is defined by either a time-limit or a job-count limit as the phase termination condition.
 
   Each phase will define one or more job types to run and provide rates for each of those job types during the duration of the phase.
 
-## Reporter:
+## dist-reporter:
 
   Gathers & stores metrics as long as it is running at a configuration driven interval.
 
   Normally runs on the aggr host.
 
-  Reporter is invoked providing a reporter configuration file ( yaml-based ) as it's only command-line argument.
+  The reporter is invoked providing a reporter configuration file ( yaml-based ) as it's only command-line argument.
 
-  The Reporter configuration sets a number of general configuration values as well as specifying the metrics reporting interval.
+  The reporter configuration sets a number of general configuration values as well as specifying the metrics reporting interval.
 
-## Manager:
+## dist-manager:
 
   A script to wrap starting and/or stopping some quantity of Worker processes.
 
-  Manager is usually invoked as follows:
+  The manager is usually invoked as follows:
   > "./manager.rb --action `<START|STOP|LIST>` --quantity 75 --command "./worker.rb ./data/worker_config.yaml"
 
-  Manager is one of the only scripts in the Dist framework that doesn't following the configuration file-path as only argument pattern.
+  The manager is one of the only scripts in the Dist framework that doesn't following the configuration file-path as only argument pattern.
 
-## Worker:
+## dist-worker:
 
   Periodically polls the job queue for jobs in a 'READY' state, and begins running them. Working until completion or failure.
 
@@ -83,19 +83,21 @@ You *should* configure your system to have a high quantity of file descriptors a
 
   Depending on the exit state of the job, the job data will be moved into a final 'BROKEN' or 'COMPLETE' state.
 
-  Worker is invoked providing a worker configuration file ( yaml-based ) as it's only command-line argument.
+  The worker is invoked providing a worker configuration file ( yaml-based ) as it's only command-line argument.
 
-  **NORMALLY** Worker is not invoked directly, but rather is run via the Manager script to start/stop multiple instances at the same time.
+  **NORMALLY** The worker is not invoked directly, but rather is run via the manager script to start/stop multiple instances at the same time.
 
   ( Example: I tend to run 75 copies of the worker on each of 8 hosts during my test runs. )
 
-## Additionally, soon to exist in it's own repo ( dist-graph ) repo: Data.
+## The live data service:
 
-  Data provides a live web interface to the metrics gathered by the Reporter.
+  Provided in it's own repository as it is not strictly necessary. See https://github.com/a1ph4g33k/dist-graph
+  
+  The data service provides a live web interface & image generator for the metrics gathered by the reporter.
 
   Normally runs on the aggr host.
 
-  Data is not invoked directly, but rather through start_dataserver.sh which starts the data script using the Unicorn web server engine, making it parallelized.
+  The data service is not invoked directly, but rather through it's own start_dataserver.sh which runs the data service within Unicorn.
 
 # Configuration files:
 
