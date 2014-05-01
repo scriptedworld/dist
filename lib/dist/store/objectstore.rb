@@ -6,7 +6,6 @@ require 'json'
 require 'yaml'
 require 'singleton'
 
-require 'dist/helpers'
 require 'dist/logged'
 
 module Dist
@@ -14,8 +13,6 @@ module Dist
   class ObjectStore
 
     include Singleton
-
-    # include Helpers
 
     include Logged
 

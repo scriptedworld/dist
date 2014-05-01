@@ -1,7 +1,7 @@
 
-require 'dist/helpers'
 require 'dist/app/baseapp'
 require 'dist/config/runnerconfig'
+require 'dist/job'
 
 module Dist
 

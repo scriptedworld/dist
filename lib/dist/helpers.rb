@@ -6,20 +6,13 @@ require 'json'
 require 'yaml'
 
 require 'dist/assert'
+require 'dist/logged'
 
 require 'dist/store/jobstore'
 require 'dist/store/eventstore'
 
-require 'dist/job/job'
-require 'dist/job/jobexception'
-
-# NOTE: Events do not require classes,
-#       they are simply freeform data. Jobs have extended functionality.
-
-# The following Job subtypes are testing specific, and have no other purpose.
-require 'dist/job/emptyjob'
-require 'dist/job/exceptionjob'
-require 'dist/job/jobexceptionjob'
+# Implicitly requires dist/store/objectstore.rb -> Sets properties on ObjectStore
+# Implicitly requires dist/store/eventstore.rb -> used by record_run_event
 
 module Dist
 

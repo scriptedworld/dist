@@ -1,8 +1,6 @@
 
 require 'fileutils'
 
-require 'dist/helpers'
-
 module Dist
 
   module Logged

@@ -1,6 +1,7 @@
 
 require 'dist/app/baseapp'
 require 'dist/config/workerconfig'
+require 'dist/store/jobstore'
 
 module Dist
 
