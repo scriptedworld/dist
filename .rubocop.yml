@@ -1,4 +1,8 @@
 ---
+# Part of my coding style, not willing to give it up.
+CaseIndentation:
+  Enabled: false
+
 # Don't use extra space inside of parens,
 # Part of my coding style, not willing to give it up.
 SpaceInsideParens:
@@ -10,9 +14,19 @@ SpaceInsideBrackets:
   Enabled: false
 
 # Standard doesn't like when I pad the body of funtions with whitespace.
-# I do so for readability, makes it easier to visually pull apart the wrapping 
+# I do so for readability, makes it easier to visually pull apart the wrapping
 # functionality with the body.
-EmptyLinesAroundBody:
+
+EmptyLinesAroundModuleBody:
+  Enabled: false
+
+EmptyLinesAroundClassBody:
+  Enabled: false
+
+EmptyLinesAroundMethodBody:
+  Enabled: false
+
+EmptyLinesAroundBlockBody:
   Enabled: false
 
 LineLength:
@@ -34,5 +48,9 @@ SignalException:
 
 # I don't prefer alias_method to alias.
 Alias:
+  Enabled: false
+
+# I don't like the new lambda syntax, don't force me to use it.
+Lambda:
   Enabled: false
 
