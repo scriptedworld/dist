@@ -14,7 +14,4 @@ Signal.trap( 'INT' ) { exit! }
 # Polite termination request.
 Signal.trap( 'TERM' ) { exit! }
 
-# Terminated Ordered.
-Signal.trap( 'KILL' ) { exit! }
-
 Dist::WorkerApp.new.run
