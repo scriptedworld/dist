@@ -7,7 +7,7 @@ module Dist
 
     include Helpers
 
-    def preset_debug_state_and_validate_result( pre_debug_state, expected_debug_state, &block )
+    def preset_debug_state_and_validate_result( pre_debug_state, expected_debug_state, &_block )
 
       old_state = $DEBUG
       $DEBUG = pre_debug_state
@@ -29,7 +29,7 @@ module Dist
             config_class.new( temp_file.path )
           end
         end
-      ).to be_true
+      ).to be_truthy
     end
 
   end

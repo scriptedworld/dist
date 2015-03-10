@@ -51,6 +51,16 @@ module Dist
       #       ( through the count of subscribers for the job ready channel )
     end
 
+    def show_set_counts
+      jobs_in_state_count = @redis.scard( @lifecycle_set_name )
+      review_count        = @redis.scard( @review_set_name )
+      seen_count          = @redis.scard( @seen_set_name )
+
+      display_debug_message( "Total Quantity: #{ jobs_in_state_count }" )
+      display_debug_message( "Quantity to review: #{ review_count }" )
+      display_debug_message( "Quantity already seen: #{ seen_count }" )
+    end
+
     def setup_queue_for_review( job_state )
 
       @review_set_name = "stats_work.REVIEW_#{ job_state }"
@@ -59,19 +69,11 @@ module Dist
 
       @redis.sdiffstore( @review_set_name, @lifecycle_set_name, @seen_set_name )
 
-      if $DEBUG
-        jobs_in_state_count = @redis.scard( @lifecycle_set_name )
-        review_count        = @redis.scard( @review_set_name )
-        seen_count          = @redis.scard( @seen_set_name )
-
-        display_debug_message( "Total Quantity: #{ jobs_in_state_count }" )
-        display_debug_message( "Quantity to review: #{ review_count }" )
-        display_debug_message( "Quantity already seen: #{ seen_count }" )
-      end
+      show_set_counts if $DEBUG
 
     end
 
-    def each_timing_key( job_data, &block )
+    def each_timing_key( job_data, &_block )
 
       job_keys = job_data.keys
       timing_keys = job_keys.select { |key| key.start_with?( @timing_stat_prefix ) }
@@ -117,7 +119,7 @@ module Dist
       setup_queue_for_review( job_state )
 
       all_lifecycle_durations = []
-      duration_values = Hash.new { |hash, key| hash[ key ] = Array.new }
+      duration_values = Hash.new { |hash, key| hash[ key ] = [] }
 
       job_class_counts = Hash.new( 0 )
 
@@ -155,7 +157,7 @@ module Dist
       @stats[ "elapsed_#{ job_state }_all" ] = metrics
 
       # We should track how many jobs of each class occurred in this state.
-      job_class_counts.each_pair do |key, value|
+      job_class_counts.each_value do |value|
         @stats[ "#{ job_state }_#{ job_class }_count" ] = value
       end
 

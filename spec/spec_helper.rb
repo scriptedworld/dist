@@ -16,3 +16,5 @@ require 'config_helpers'
 require 'debug_helpers'
 
 require 'dist/config/baseconfig'
+
+require 'dist/job/emptyjob'

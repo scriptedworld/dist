@@ -153,7 +153,7 @@ module Dist
 
     def run_ps_command
 
-      proc_tree = Hash.new { |ht, k| ht[k] = Array.new }
+      proc_tree = Hash.new { |ht, k| ht[k] = [] }
       proc_list = `ps -eo pid,ppid`.scan( /\d+/ )
 
       # To begin, populate things based on what we know ( only 1 generation )

@@ -12,12 +12,12 @@ module Dist
 
     before( :all ) do
 
-      @attribute_hashes = Hash.new
+      @attribute_hashes = {}
 
-      junk_attributes = Hash.new
+      junk_attributes = {}
       junk_attributes[ 'non_required_key' ] = 'non required value'
 
-      @all_attributes = Hash.new
+      @all_attributes = {}
       @all_attributes[ 'name'       ] = 'Runner'
       @all_attributes[ 'redis_host' ] = 'localhost'
       @all_attributes[ 'redis_port' ] = 6379

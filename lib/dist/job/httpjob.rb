@@ -7,7 +7,7 @@ module Dist
 
   class HttpJob < Job
 
-    def with_http_session( host_url, &block )
+    def with_http_session( host_url, &_block )
       host_uri = URI( host_url )
 
       @http = Net::HTTP.new( host_uri.hostname, host_uri.port )

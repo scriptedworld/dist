@@ -85,7 +85,7 @@ module Dist
       raise 'Job::run must be overridden.'
     end
 
-    def teardown( e = nil )
+    def teardown( _e = nil )
       # pass. to be overridden by derivative class.
     end
 
@@ -93,7 +93,7 @@ module Dist
       self.state = 'COMPLETE'
     end
 
-    def failure( e = nil )
+    def failure( _e = nil )
       self.state = 'BROKEN'
     end
 
@@ -166,7 +166,7 @@ module Dist
 
     end
 
-    def do_phase( phase_name, &block )
+    def do_phase( phase_name, &_block )
       start_phase( phase_name )
       yield
       end_phase( phase_name )

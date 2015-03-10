@@ -10,20 +10,20 @@ module Dist
 
     before( :all ) do
 
-      all_attributes_polling                            = Hash.new
+      all_attributes_polling                            = {}
       all_attributes_polling[ 'queue_method'          ] = 'polling'
       all_attributes_polling[ 'polling_timing'        ] = 'randomized'
       all_attributes_polling[ 'polling_delay_seconds' ] = 1.0
       all_attributes_polling[ 'polling_delay_stdev'   ] = 0.25
 
-      all_attributes_signals                            = Hash.new
+      all_attributes_signals                            = {}
       all_attributes_signals[ 'queue_method'          ] = 'signals'
 
-      @attribute_hashes = Hash.new
+      @attribute_hashes = {}
       @attribute_hashes[ :all_polling ] = all_attributes_polling
       @attribute_hashes[ :all_signals ] = all_attributes_signals
 
-      @attribute_hashes[ :empty ] = Hash.new
+      @attribute_hashes[ :empty ] = {}
 
     end
 
@@ -75,7 +75,7 @@ module Dist
       describe 'polling specific attributes should be honored when provided' do
 
         before( :each ) do
-          @specific_attributes = Hash.new
+          @specific_attributes = {}
           @specific_attributes[ 'queue_method'          ] = 'polling'
           @specific_attributes[ 'polling_timing'        ] = 'randomized'
           @specific_attributes[ 'polling_delay_seconds' ] = 10.0

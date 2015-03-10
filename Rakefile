@@ -23,7 +23,7 @@ RSpec::Core::RakeTask.new( :spec ) do |t|
   t.fail_on_error = true
 end
 
-Rubocop::RakeTask.new( :rubocop )
+RuboCop::RakeTask.new( :rubocop )
 
 FlayTask.new( :flay ) do |flay|
   flay.dirs = dirs

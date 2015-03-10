@@ -10,12 +10,12 @@ module Dist
 
     before( :all ) do
 
-      @all_attributes = Hash.new
+      @all_attributes = {}
       @all_attributes[ 'report_interval_seconds' ] = 10.0
 
-      @attribute_hashes = Hash.new
+      @attribute_hashes = {}
       @attribute_hashes[ :all ] = @all_attributes
-      @attribute_hashes[ :empty ] = Hash.new
+      @attribute_hashes[ :empty ] = {}
 
     end
 

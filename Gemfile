@@ -1,4 +1,4 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
 gemspec
 
@@ -6,6 +6,8 @@ group :development, :test do
   gem 'rake'
   gem 'rdoc'
   gem 'rdoc-tags'
+  gem 'pry'
+  gem 'pry-byebug'
 end
 
 group :test do
@@ -17,4 +19,3 @@ group :test do
   gem 'rubocop'
 
 end
-

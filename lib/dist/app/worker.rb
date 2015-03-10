@@ -81,7 +81,7 @@ module Dist
           display_error_message( e.backtrace )
 
           if $DEBUG
-            require 'pry'
+            require 'pry-byebug'
             binding.pry
           end
 

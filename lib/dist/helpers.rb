@@ -68,7 +68,7 @@ module Dist
 
     def validate_keys_exist( hash, *attribute_names )
       raise 'Provided argument is nil.' if hash.nil?
-      raise 'Provided argument is not a hash.' unless hash.kind_of?( Hash )
+      raise 'Provided argument is not a hash.' unless hash.is_a?( Hash )
 
       attribute_names.each do |a|
         raise "Key #{ a } missing." unless hash.key?( a )

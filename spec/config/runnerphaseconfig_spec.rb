@@ -10,7 +10,7 @@ module Dist
 
     before( :all ) do
 
-      @all_attributes_base = Hash.new
+      @all_attributes_base = {}
       @all_attributes_base[ 'name'        ] = 'Phase One'
       @all_attributes_base[ 'description' ] = 'Junk Phase for Testing'
       @all_attributes_base[ 'jobs'        ] = [
@@ -120,7 +120,7 @@ module Dist
       end
 
       it 'should create and validate a RunnerPhaseJobConfig object for each member of the jobs array.' do
-        RunnerPhaseJobConfig.any_instance.should_receive( :validate ).once
+        expect_any_instance_of( RunnerPhaseJobConfig ).to receive( :validate ).once
         RunnerPhaseConfig.new( @all_attributes_with_count ).validate
       end
 

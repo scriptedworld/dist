@@ -10,7 +10,7 @@ module Dist
 
     before( :all ) do
 
-      @all_attributes = Hash.new
+      @all_attributes = {}
       @all_attributes[ 'job_class' ] = 'Dist::EmptyJob'
       @all_attributes[ 'per_unit' ] = 1
       @all_attributes[ 'unit' ] = 'SECOND'

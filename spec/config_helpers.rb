@@ -53,9 +53,7 @@ module Dist
     end
 
     def cleanup_temp_config_files( temp_file_list = [] )
-      temp_file_list.each do |curr_temp_file|
-        curr_temp_file.unlink
-      end
+      temp_file_list.each( &:unlink )
     end
 
     def with_temp_file_from_attributes( attributes, additional_params = {} )
@@ -70,7 +68,7 @@ module Dist
 
     end
 
-    def with_config( attributes, config_class, additional_params = {}, &block )
+    def with_config( attributes, config_class, additional_params = {}, &_block )
       with_temp_file_from_attributes( attributes, additional_params ) do |temp_file|
         conf = config_class.new( temp_file.path )
         yield conf

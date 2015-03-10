@@ -181,7 +181,7 @@ module Dist
 
     def wait_for_signal( signalname )
       redis_instance.subscribe( signalname ) do |on|
-        on.message do |channel, msg|
+        on.message do |_channel, _msg|
           redis_instance.unsubscribe
         end
       end
