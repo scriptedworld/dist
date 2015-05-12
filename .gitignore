@@ -10,3 +10,5 @@ vendor/
 
 docs/
 
+config/redis.testing.conf
+
