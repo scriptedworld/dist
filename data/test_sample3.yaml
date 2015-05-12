@@ -5,7 +5,6 @@ redis_port: 6379
 redis_pass: slenderman
 base_attributes_file_path: ./data/tests/base_attributes.yaml
 report_interval_seconds: 5
-log_dir: ./logs
 use_poisson: false # Must be true or false
 continuous: false  # Must be true or false
 debug: false       # Must be true or false

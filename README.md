@@ -9,11 +9,11 @@ DIST is a distributed Job Execution Engine.
 - Getting Started.
 - Description of the framework:
 - Description of each script:
-  - Runner:
-  - Reporter:
-  - Manager:
-  - Worker:
-  - Additionally, soon to exist in it's own repo ( dist-graph ) repo: Data.
+  - dist-runner:
+  - dist-reporter:
+  - dist-manager:
+  - dist-worker:
+  - The live data service:
 - Configuration files:
   - Common configuration items:
   - Runner Config File:
@@ -92,7 +92,7 @@ You *should* configure your system to have a high quantity of file descriptors a
 ## The live data service:
 
   Provided in it's own repository as it is not strictly necessary. See https://github.com/a1ph4g33k/dist-graph
-  
+
   The data service provides a live web interface & image generator for the metrics gathered by the reporter.
 
   Normally runs on the aggr host.
@@ -109,11 +109,13 @@ You *should* configure your system to have a high quantity of file descriptors a
 
   * `name`: The name of the configuration file. Optionally, you can also add a 'description' value. The name will be logged during the script runtime, but generally exists
           to help when you have lots of configuration files.
-  * `log_dir`: Where you want log files from the given script to be written to.
   * `redis_host`: host name or ip to talk to redis.
   * `redis_port`: port number to talk to redis.
   * `redis_pass`: redis server auth value. ( specified in your redis config. default provided in the example configs is 'slenderman' )
   * `debug`: true or false
+
+  Use an Environment variable 'DIST_LOG_DIR' to set the desired directory for log files to be saved in.
+  Leaving this variable unset will still provide console output, but not log to a file.
 
 ## Runner Config File:
 
@@ -134,7 +136,7 @@ You *should* configure your system to have a high quantity of file descriptors a
 
   * `total_count`: The total number of jobs which will be inserted during this phase. ( as opposed to `phase_duration` )
 
-  or 
+  or
 
   * `phase_duration`: Numeric element of a timed length for the phase duration ( as opposed to `total_count` )
   and
