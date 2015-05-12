@@ -46,7 +46,8 @@ You *should* configure your system to have a high quantity of file descriptors a
 
   Normally runs on the aggr host.
 
-  The runner is invoked providing a runner configuration file ( yaml-based ) as it's only command-line argument.
+  Usage:
+  > ./bin/dist-runner [--daemonize] <Path to YAML-based configuration file.>
 
   The runner configuration sets up a number of general configuration values and then defines the phases of your test.
 
@@ -60,7 +61,8 @@ You *should* configure your system to have a high quantity of file descriptors a
 
   Normally runs on the aggr host.
 
-  The reporter is invoked providing a reporter configuration file ( yaml-based ) as it's only command-line argument.
+  Usage:
+  > ./bin/dist-reporter [--daemonize] <Path to YAML-based configuration file.>
 
   The reporter configuration sets a number of general configuration values as well as specifying the metrics reporting interval.
 
@@ -83,7 +85,8 @@ You *should* configure your system to have a high quantity of file descriptors a
 
   Depending on the exit state of the job, the job data will be moved into a final 'BROKEN' or 'COMPLETE' state.
 
-  The worker is invoked providing a worker configuration file ( yaml-based ) as it's only command-line argument.
+  Usage:
+  > ./bin/dist-worker [--daemonize] <Path to YAML-based configuration file.>
 
   **NORMALLY** The worker is not invoked directly, but rather is run via the manager script to start/stop multiple instances at the same time.
 

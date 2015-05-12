@@ -21,7 +21,19 @@ module Dist
     # TODO: Add code here to make sure that run has NOT been overriden.
     def run
       load_config
-      instance_run
+
+      if ARGV.include? '--daemonize'
+        curr_dir = Dir.pwd
+        Process.daemon
+        Dir.chdir( curr_dir )
+      end
+
+      begin
+        instance_run
+      rescue => e
+        display_error_message( e )
+      end
+
     end
 
     def instance_run
@@ -31,7 +43,9 @@ module Dist
     def load_config
 
       config_klass = config_class
-      @config = config_klass.new( ARGV.pop )
+
+      config_file_path = File.expand_path( ARGV.pop, Dir.pwd )
+      @config = config_klass.new( config_file_path )
 
       handle_redis_config( @config[ 'redis_host' ], @config[ 'redis_port' ], @config[ 'redis_pass' ] )
 

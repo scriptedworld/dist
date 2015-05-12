@@ -4,9 +4,9 @@ Gem::Specification.new do |s|
 
   s.name         = 'dist'
   s.description  = 'A job scheduling/execution/monitoring framework used in load & interaction testing.'
-  s.version      = '2.0.2'
+  s.version      = '2.0.3'
   s.summary      = 'Distributed job execution & management system.'
-  s.date         = '2015-03-10'
+  s.date         = '2015-05-12'
   s.authors      = 'Jeff Wood'
   s.email        = 'j@a1ph4g33k.com'
   s.homepage     = 'http://github.com/a1ph4g33k/dist'
