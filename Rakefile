@@ -17,7 +17,7 @@ require 'rspec/core/rake_task'
 require 'rdoc/task'
 require 'rdoc/tags_task'
 
-dirs = [ '.', 'lib' ]
+dirs = [ '.' ]
 
 RSpec::Core::RakeTask.new( :spec ) do |t|
   t.fail_on_error = true
