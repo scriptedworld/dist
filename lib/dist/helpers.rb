@@ -47,8 +47,9 @@ module Dist
     end
 
     def load_file( file_path )
-      raise "File '#{ file_path }' not found." unless File.exist?( file_path )
-      File.open( file_path ).read
+      complete_file_path = File.expand_path( file_path, Dir.pwd )
+      raise "File '#{ complete_file_path }' not found." unless File.exist?( complete_file_path )
+      File.open( complete_file_path ).read
     end
 
     def load_json_file( file_path )
