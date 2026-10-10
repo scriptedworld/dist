@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.authors      = 'Jeff Wood'
   s.email        = 'j@a1ph4g33k.com'
   s.homepage     = 'http://github.com/a1ph4g33k/dist'
-  s.license      = 'MIT'
+  s.license      = 'Apache-2.0'
 
   s.require_path = 'lib'
 
